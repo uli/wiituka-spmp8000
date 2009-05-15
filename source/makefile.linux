@@ -1,0 +1,46 @@
+# use "make -f makefile.unix RELEASE=TRUE" to create release executable
+
+CC	= gcc
+
+GFLAGS	= -Wall `sdl-config --cflags` -DLINUX
+
+ifdef RELEASE
+CFLAGS	= $(GFLAGS) -O2 -funroll-loops -ffast-math -fomit-frame-pointer -fno-strength-reduce -finline-functions -s
+else
+CFLAGS	= $(GFLAGS) -ggdb
+endif
+
+LIBS = `sdl-config --libs` -lz
+
+pituka: caprice/cap32.c caprice/crtc.o caprice/fdc.o caprice/psg.o caprice/tape.o caprice/z80.o linux/main.o port/utils.o port/dskutils.o port/unzip.o caprice/cap32.h caprice/z80.h
+	$(CC) $(CFLAGS) $(IPATHS) -o pituka caprice/cap32.c linux/main.o port/utils.o port/dskutils.o port/unzip.o caprice/crtc.o caprice/fdc.o caprice/psg.o caprice/tape.o caprice/z80.o $(LIBS)
+
+main.o: linux/main.c caprice/cap32.h caprice/crtc.h caprice/z80.h
+	$(CC) $(CFLAGS) -c linux/main.c
+
+crtc.o: caprice/crtc.c caprice/cap32.h caprice/crtc.h caprice/z80.h
+	$(CC) $(CFLAGS) -c caprice/crtc.c
+
+fdc.o: caprice/fdc.c caprice/cap32.h caprice/z80.h
+	$(CC) $(CFLAGS) -c caprice/fdc.c
+
+psg.o: caprice/psg.c caprice/cap32.h caprice/z80.h
+	$(CC) $(CFLAGS) -c caprice/psg.c
+
+tape.o: caprice/tape.c caprice/cap32.h caprice/tape.h caprice/z80.h
+	$(CC) $(CFLAGS) -c caprice/tape.c
+
+z80.o: caprice/z80.c caprice/z80.h caprice/cap32.h
+	$(CC) $(CFLAGS) -c caprice/z80.c
+
+utils.o: port/utils.c  caprice/cap32.h
+	$(CC) $(CFLAGS) -c port/utils.c
+
+dskutils.o: port/dskutils.c  port/dskutils.h caprice/cap32.h
+	$(CC) $(CFLAGS) -c port/dskutils.c
+
+unzip.o: port/unzip.c  port/unzip.h caprice/cap32.h
+	$(CC) $(CFLAGS) -c port/unzip.c
+
+clean:
+	rm caprice/*.o linux/*.o port/*.o caprice/*~ linux/*~ port/*.o~ pituka 
