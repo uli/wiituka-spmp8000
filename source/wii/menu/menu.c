@@ -345,13 +345,14 @@ bool ButtonsCommon (int command, sMenuEntry * current)
   else
 	WiiStatus.nWiimotes = 1;
 
-
-  if((controls.wpad1.bDown & WPAD_BUTTON_LEFT) && (glistposition > 0))
-	menuthread_callanimButtons(1, current);
-  else if((controls.wpad1.bDown & WPAD_BUTTON_RIGHT) && ((glistposition + ROWS_PER_SCREEN) < (WiiStatus.nRoms)))
-	{
+  if(current->buttons[0].btype == ButtonNode){
+  	if((controls.wpad1.bDown & WPAD_BUTTON_LEFT) && (glistposition > 0))
+		menuthread_callanimButtons(1, current);
+  	else if((controls.wpad1.bDown & WPAD_BUTTON_RIGHT) && ((glistposition + ROWS_PER_SCREEN) < (WiiStatus.nRoms)))
+		{
 			menuthread_callanimButtons(0, current);
-	}
+		}
+  }
 
   if(!(controls.wpad1.bHeld & WPAD_BUTTON_HOME)){ //evita que al salir de la emulacion se pierda el icono de la gunstick
      if(select) //cursor encima de boton?

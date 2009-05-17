@@ -126,7 +126,7 @@ run:
 	wiiload $(TARGET).dol
 
 commit:
-	svn commit unstable/
+	svn commit 
 
 #---------------------------------------------------------------------------------
 else
