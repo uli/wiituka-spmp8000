@@ -174,13 +174,17 @@ int main(int argc, char *argv[]) {
            WiiStatus.Dev_Fat = 1;
 
 
-  //INIT DHCP WII LAN
-  net_init_thread();
+  if(WiiStatus.Dev_Fat)
+    Wiituka_LoadCFG("fat3:");
 
   printf("."); 
 
-  if(WiiStatus.Dev_Fat)
-    Wiituka_LoadCFG("fat3:");
+  //TODO: re-check video for width patch
+  
+
+  //INIT DHCP WII LAN
+  //TODO: if opt?
+  net_init_thread();
 
   printf(" .\n"); 
 

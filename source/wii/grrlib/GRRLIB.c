@@ -543,21 +543,36 @@ void GRRLIB_InitVideo () {
 
 	rmode = VIDEO_GetPreferredMode(NULL);
 
-    // Widescreen patch by CashMan
+
+        if (rmode == NULL)
+            return;
+
+        switch (rmode->viTVMode) 
+        {
+            case VI_DEBUG_PAL:      // PAL 50hz 576i
+                    rmode = &TVPal574IntDfScale;
+                    break;
+        }
+
+        // Widescreen patch by CashMan
  	if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
  	{
- 	      //rmode->viWidth = 678;
- 	      //rmode->viXOrigin = (VI_MAX_WIDTH_NTSC - 678)/2;
-	      rmode->viWidth = VI_MAX_WIDTH_PAL-12;
-	      rmode->viXOrigin = ((VI_MAX_WIDTH_PAL - rmode->viWidth) / 2) + 2;
+              //TODO: SELECT WIDESCREEN MODE BY CONFIG...
+ 
+ 	      rmode->viWidth = 678;
+ 	      rmode->viXOrigin = (VI_MAX_WIDTH_NTSC - 678)/2;
+	      //rmode->viWidth = VI_MAX_WIDTH_PAL-12;
+	      //rmode->viXOrigin = ((VI_MAX_WIDTH_PAL - rmode->viWidth) / 2) + 2;
 
  	}
+
 	VIDEO_Configure (rmode);
 	xfb[0] = (u32 *)MEM_K0_TO_K1(SYS_AllocateFramebuffer(rmode)); 
 	xfb[1] = (u32 *)MEM_K0_TO_K1(SYS_AllocateFramebuffer(rmode));
 
 	// Initialise the console, required for printf
-	console_init (xfb[0], 20, 64, rmode->fbWidth, rmode->xfbHeight, rmode->fbWidth * 2); //TODO: CREAR UN FB PARA LA CONSOLA PRINTF, etc..
+        //TODO: CREAR UN FB PARA LA CONSOLA PRINTF, etc..
+	console_init (xfb[0], 20, 64, rmode->fbWidth, rmode->xfbHeight, rmode->fbWidth * 2);
 
         /*** Clear framebuffer to black ***/
         VIDEO_ClearFrameBuffer (rmode, xfb[0], COLOR_BLACK);
@@ -600,9 +615,8 @@ void GRRLIB_Start(){
 
 	GX_Init (gp_fifo, DEFAULT_FIFO_SIZE);
 
-	// clears the bg to color and clears the z buffer
-	GXColor background = { 0, 0, 0, 0xff };
-	GX_SetCopyClear (background, 0x00ffffff);
+        // Clears the BG to color and clears the z-buffer
+        GX_SetCopyClear((GXColor){ 0, 0, 0, 0xff }, GX_MAX_Z24);
 
 	// other gx setup
 	yscale = GX_GetYScaleFactor(rmode->efbHeight,rmode->xfbHeight);
@@ -623,18 +637,18 @@ void GRRLIB_Start(){
 	// setup the vertex descriptor
 	// tells the flipper to expect direct data
 	GX_ClearVtxDesc();
-		GX_InvVtxCache ();
-		GX_InvalidateTexAll();
+	GX_InvVtxCache ();
+	GX_InvalidateTexAll();
 
 	GX_SetVtxDesc(GX_VA_TEX0, GX_NONE);
 	GX_SetVtxDesc(GX_VA_POS, GX_DIRECT);
 	GX_SetVtxDesc (GX_VA_CLR0, GX_DIRECT);
 
 
-		GX_SetVtxAttrFmt (GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-		GX_SetVtxAttrFmt (GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-		GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-		GX_SetZMode (GX_FALSE, GX_LEQUAL, GX_TRUE);
+	GX_SetVtxAttrFmt (GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+	GX_SetVtxAttrFmt (GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+	GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+	GX_SetZMode (GX_FALSE, GX_LEQUAL, GX_TRUE);
 
 	GX_SetNumChans(1);
 	GX_SetNumTexGens(1);

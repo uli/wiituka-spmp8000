@@ -375,7 +375,7 @@ void UpdateScreen (void)
 {
 
    GRRLIB_Render();
-  // GRRLIB_VSync (); //enlentece demasiado la emulacion, por el momento off.
+  // GRRLIB_VSync (); //enlentece demasiado la gui durante la emulacion, por el momento off.
 
 }
 

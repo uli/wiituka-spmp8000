@@ -96,7 +96,7 @@ lwp_t animthreads[1];
 int menuthread_callanimButtons( int btn, sMenuEntry * current );
 void *menuthread_animButtons(void * arg);
 void Menu_UpdateButtonsLabels ( int pbpos );
-#define ANIM_NEXT_ROWS 640
+#define ANIM_NEXT_ROWS 480
 #define ROWS_PER_SCREEN 6
 int glistposition = 0;
 
@@ -631,6 +631,8 @@ void MenuClose(void)
 
 void ShowSplash (void)
 {
+
+  //TODO: add new layer
 
   WelcomeScreen (LOAD);
   bool ended = false;
