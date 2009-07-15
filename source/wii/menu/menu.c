@@ -346,9 +346,9 @@ bool ButtonsCommon (int command, sMenuEntry * current)
 	WiiStatus.nWiimotes = 1;
 
   if(current->buttons[0].btype == ButtonNode){
-  	if((controls.wpad1.bDown & WPAD_BUTTON_LEFT) && (glistposition > 0))
+  	if((controls.wpad1.bDown & (WPAD_BUTTON_LEFT|WPAD_BUTTON_MINUS)) && (glistposition > 0))
 		menuthread_callanimButtons(1, current);
-  	else if((controls.wpad1.bDown & WPAD_BUTTON_RIGHT) && ((glistposition + ROWS_PER_SCREEN) < (WiiStatus.nRoms)))
+  	else if((controls.wpad1.bDown & (WPAD_BUTTON_RIGHT|WPAD_BUTTON_PLUS)) && ((glistposition + ROWS_PER_SCREEN) < (WiiStatus.nRoms)))
 		{
 			menuthread_callanimButtons(0, current);
 		}
