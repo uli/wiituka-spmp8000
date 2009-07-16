@@ -13,7 +13,7 @@
 #ifndef wiixml_h
 #define wiixml_h
 
-#define DEFAULT_XMLVER 0x100
+#define DEFAULT_XMLVER 0x101
 #define DEFAULT_XMLGAMELIST 0x00
 #define DEFAULT_WIIBUILD  92
 

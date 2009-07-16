@@ -54,3 +54,4 @@ s32 WPAD_SetLeds(s32 chan, int leds)
 		WIIMOTE_ENABLE_STATE(wm, WIIMOTE_STATE_RUMBLE);
 	return WPAD_Rumble(chan, rumble);
 }
+

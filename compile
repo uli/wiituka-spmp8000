@@ -8,7 +8,7 @@
 TMPH=`mktemp`
 trap "rm -f $TMPH" EXIT
 
-BASE="`basename $PWD`"
+BASE=wiituka #"`basename $PWD`"
 ELF="$BASE.elf"
 DOL="$BASE.dol"
 

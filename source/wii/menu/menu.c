@@ -54,6 +54,8 @@ t_element b_snap;
 t_element b_snap_save;
 t_element b_snap_load;
 
+t_element f_devices;
+
 t_fslist gamelist = { 
 			{"", SU_NONE}, 
 			{ "", "", "", "", ""}, 0, 
@@ -596,6 +598,16 @@ bool MenuCommon (int command, int section)
 
  	  Element_SelectImg( &b_snap_load, 1 ); 
 
+	  Element_Init(&f_devices);
+	  if(!Element_allocImgs(&f_devices, 1))
+		return false;
+
+	  if(!Element_LoadImg( &f_devices, devices_sd_png ))
+		return false;
+
+ 	  Element_SelectImg( &f_devices, 1 ); 
+
+
 	break;
 	
 	case UNLOAD:
@@ -699,7 +711,7 @@ void ShowMenu (int nMenu)
   PrintW (100, 400, debugt);
   sprintf(debugt,"      (B) ONLY LOAD ROM");
   PrintW (100, 410, debugt);
-  sprintf(debugt,"Wiituka v0.98.6");
+  sprintf(debugt,"Wiituka v0.98.7");
   PrintW (20, 450, debugt);
 
 

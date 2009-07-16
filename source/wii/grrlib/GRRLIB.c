@@ -557,13 +557,16 @@ void GRRLIB_InitVideo () {
         // Widescreen patch by CashMan
  	if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
  	{
-              //TODO: SELECT WIDESCREEN MODE BY CONFIG...
- 
- 	      rmode->viWidth = 678;
- 	      rmode->viXOrigin = (VI_MAX_WIDTH_NTSC - 678)/2;
-	      //rmode->viWidth = VI_MAX_WIDTH_PAL-12;
-	      //rmode->viXOrigin = ((VI_MAX_WIDTH_PAL - rmode->viWidth) / 2) + 2;
-
+              if(VIDEO_HaveComponentCable())
+              {
+	          rmode->viWidth = VI_MAX_WIDTH_PAL-12;
+	          rmode->viXOrigin = ((VI_MAX_WIDTH_PAL - rmode->viWidth) / 2) + 2;
+              }
+              else
+              {
+ 	          rmode->viWidth = 678;
+ 	          rmode->viXOrigin = (VI_MAX_WIDTH_NTSC - 678)/2;
+              }
  	}
 
 	VIDEO_Configure (rmode);

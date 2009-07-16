@@ -23,6 +23,8 @@ extern const u8 cursor_open_png[];
 extern const u8 cursor_point_png[];
 extern const u8 cursor_gun_png[];
 
+extern const u8 devices_sd_png[];
+
 extern const u8 button_base_normal_png[];
 extern const u8 button_base_over_png[];
 

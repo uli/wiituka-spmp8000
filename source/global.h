@@ -69,6 +69,7 @@ typedef struct{
    int cpcspeed;
    int cpcfps;
    int lastrom;
+   int disablenet;
 }xmlWiiCFG;
 
 typedef struct{

@@ -66,6 +66,9 @@ bool XML_savePublic(char * filename)
    sprintf(tmp, "%i", WiitukaXML.lastrom);
    mxmlElementSetAttr(data, "lastRom", tmp);
 
+   sprintf(tmp, "%i", WiitukaXML.disablenet);
+   mxmlElementSetAttr(data, "disableNet", tmp);
+
    FILE *fp;
    fp = fopen(filename, "w");
 
@@ -359,7 +362,16 @@ bool XML_loadPublic(char * filename)
         if(WiitukaXML.lastrom < 0 )
   		WiitukaXML.lastrom = 0;
    }
-   
+
+   tmp=mxmlElementGetAttr(data,"disableNet");      if (tmp == NULL)
+	return false;
+   else{
+	WiitukaXML.disablenet = atoi(tmp);
+        if(WiitukaXML.disablenet != 1)
+  		WiitukaXML.disablenet = 0;
+   }
+
+ 
    mxmlDelete(data);
    mxmlDelete(tree);
 

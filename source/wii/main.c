@@ -124,6 +124,39 @@ bool BuffersInit(void)
    
 }
 
+void DevicesInit(void)
+{
+  printf(" ."); 
+
+  if(!fatInitDefault ()){ //no usar aqui mountDev, por que la primera vez debe ser iniciado asi.
+        printf("\n MAIN: Unable to initialise FAT subsystem.  Are there any connected devices?\n  I'll continue without fat support..."); 
+        WiiStatus.Dev_Fat = 0;
+        net_init_thread();
+        sleep(2);
+  }
+  else if(!CreateDirs ("fat3:"))
+  {
+        printf("\n MAIN: Unable to initialise DIRS.  Please use another SD Card\n  I'll continue without fat support..."); 
+        WiiStatus.Dev_Fat = 0;
+        net_init_thread();
+        sleep(2);
+  }
+  else
+  {
+        WiiStatus.Dev_Fat = 1;
+        Wiituka_LoadCFG("fat3:");
+
+        printf("."); 
+
+        //INIT DHCP WII LAN
+        if(!WiitukaXML.disablenet)
+            net_init_thread();
+  }
+
+  printf(" .\n"); 
+
+}
+
 
 void doPowerOff()
 {
@@ -162,31 +195,7 @@ int main(int argc, char *argv[]) {
 
   WiimoteInit();
 
-  printf(" ."); 
-
-  if(!fatInitDefault ()){ //no usar aqui mountDev, por que la primera vez debe ser iniciado asi.
-        printf(" MAIN: Unable to initialise FAT subsystem.  Are there any connected devices?\nI'll continue without fat support..."); 
-        usleep(10000);
-  }else if(!CreateDirs ("fat3:")){
-	        printf(" MAIN: Unable to initialise DIRS.  Please use another SD Card\nI'll continue without fat support..."); 
-	        usleep(10000);
-	}else
-           WiiStatus.Dev_Fat = 1;
-
-
-  if(WiiStatus.Dev_Fat)
-    Wiituka_LoadCFG("fat3:");
-
-  printf("."); 
-
-  //TODO: re-check video for width patch
-  
-
-  //INIT DHCP WII LAN
-  //TODO: if opt?
-  net_init_thread();
-
-  printf(" .\n"); 
+  DevicesInit();
 
   ShowSplash ();
 
@@ -385,6 +394,7 @@ void Wiituka_InitCFG(void)
     WiitukaXML.cpcspeed = 4;
     WiitukaXML.cpcfps = 0;
     WiitukaXML.lastrom = 0;
+    WiitukaXML.disablenet = 0;
 
     WiiStatus.Dev_Fat = -1;
     WiiStatus.Dev_Keyb = -1; 
