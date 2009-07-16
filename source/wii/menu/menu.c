@@ -54,7 +54,16 @@ t_element b_snap;
 t_element b_snap_save;
 t_element b_snap_load;
 
-t_element f_devices;
+t_img f_devices[5];
+
+#define FDEV_IMAGE_FAT 0
+#define FDEV_IMAGE_NET 1
+#define FDEV_IMAGE_WM1 2
+#define FDEV_IMAGE_WM2 3
+#define FDEV_IMAGE_KEY 4
+
+static int dev_x = 374;
+static int dev_y = 32;
 
 t_fslist gamelist = { 
 			{"", SU_NONE}, 
@@ -341,6 +350,16 @@ bool ButtonsCommon (int command, sMenuEntry * current)
 
   }
 
+  if(controls.wpad1.bDown & WPAD_BUTTON_LEFT)
+    dev_x--;
+  if(controls.wpad1.bDown & WPAD_BUTTON_RIGHT)
+    dev_x++;
+  if(controls.wpad1.bDown & WPAD_BUTTON_UP)
+    dev_y--;
+  if(controls.wpad1.bDown & WPAD_BUTTON_DOWN)
+    dev_y++;
+
+
   //in pause search second wiimote
   if(WiimoteSetup(WPAD_CHAN_1) == WPAD_ERR_NONE)
 	WiiStatus.nWiimotes = 2;
@@ -598,14 +617,30 @@ bool MenuCommon (int command, int section)
 
  	  Element_SelectImg( &b_snap_load, 1 ); 
 
-	  Element_Init(&f_devices);
-	  if(!Element_allocImgs(&f_devices, 1))
-		return false;
+	  if( !LoadTexture( &f_devices[FDEV_IMAGE_FAT], devices_fat_png) )
+	  {
+	    return false;
+	  }
 
-	  if(!Element_LoadImg( &f_devices, devices_sd_png ))
-		return false;
+	  if( !LoadTexture( &f_devices[FDEV_IMAGE_NET], devices_net_png) )
+	  {
+	    return false;
+	  }
 
- 	  Element_SelectImg( &f_devices, 1 ); 
+	  if( !LoadTexture( &f_devices[FDEV_IMAGE_WM1], devices_wm1_png) )
+	  {
+	    return false;
+	  }
+
+	  if( !LoadTexture( &f_devices[FDEV_IMAGE_WM2], devices_wm2_png) )
+	  {
+	    return false;
+	  }
+
+	  if( !LoadTexture( &f_devices[FDEV_IMAGE_KEY], devices_key_png) )
+	  {
+	    return false;
+	  }
 
 
 	break;
@@ -640,6 +675,29 @@ void MenuClose(void)
    Cursor_Free(&cursor);
 
 }
+
+void ShowDevicesStatus(void)
+{
+
+ if(WiiStatus.Dev_Fat)
+      DrawTexture(&f_devices[FDEV_IMAGE_FAT], 514, 396, 0, 1, 1, 255);
+
+ if(WiiStatus.Dev_Net)
+      DrawTexture(&f_devices[FDEV_IMAGE_NET], 488, 402, 0, 1, 1, 255);
+
+ switch(WiiStatus.nWiimotes)
+ {
+      case 2:
+           DrawTexture(&f_devices[FDEV_IMAGE_WM2], 364, 32, 0, 1, 1, 255);
+      case 1:
+           DrawTexture(&f_devices[FDEV_IMAGE_WM1], 377, 32, 0, 1, 1, 255);
+ }
+
+ if(WiiStatus.Dev_Keyb)
+      DrawTexture(&f_devices[FDEV_IMAGE_KEY], 390, 34, 0, 1, 1, 255);
+
+}
+
 
 void ShowSplash (void)
 {
@@ -707,18 +765,19 @@ void ShowMenu (int nMenu)
 
   //sprintf(debugt,"DEBUG: ROM(%s) - p(%i) n(%i) ", globalRom.filename, glistposition, WiiStatus.nRoms);
 
-  sprintf(debugt,"HELP: (A) LOAD ROM + AUTORUN");
+  sprintf(debugt,"HELP: (A) LOAD ROM + AUTORUN d(%i,%i)", dev_x, dev_y);
   PrintW (100, 400, debugt);
   sprintf(debugt,"      (B) ONLY LOAD ROM");
   PrintW (100, 410, debugt);
   sprintf(debugt,"Wiituka v0.98.7");
   PrintW (20, 450, debugt);
 
-
   ButtonsCommon(PAINT, menuCurrent);
 
-
   ButtonsCommon(CHECK, menuCurrent);
+
+  ShowDevicesStatus();
+
   Element_Paint(&cursor);
 
   GRRLIB_VSync();

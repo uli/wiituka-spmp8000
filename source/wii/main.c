@@ -129,17 +129,15 @@ void DevicesInit(void)
   printf(" ."); 
 
   if(!fatInitDefault ()){ //no usar aqui mountDev, por que la primera vez debe ser iniciado asi.
-        printf("\n MAIN: Unable to initialise FAT subsystem.  Are there any connected devices?\n  I'll continue without fat support..."); 
+        //printf("\n MAIN: Unable to initialise FAT subsystem.  Are there any connected devices?\n  I'll continue without fat support..."); 
         WiiStatus.Dev_Fat = 0;
         net_init_thread();
-        sleep(2);
   }
   else if(!CreateDirs ("fat3:"))
   {
-        printf("\n MAIN: Unable to initialise DIRS.  Please use another SD Card\n  I'll continue without fat support..."); 
+        //printf("\n MAIN: Unable to initialise DIRS.  Please use another SD Card\n  I'll continue without fat support..."); 
         WiiStatus.Dev_Fat = 0;
         net_init_thread();
-        sleep(2);
   }
   else
   {
@@ -151,6 +149,8 @@ void DevicesInit(void)
         //INIT DHCP WII LAN
         if(!WiitukaXML.disablenet)
             net_init_thread();
+        else
+            WiiStatus.Dev_Net = 0;
   }
 
   printf(" .\n"); 
