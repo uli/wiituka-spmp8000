@@ -62,9 +62,6 @@ t_img f_devices[5];
 #define FDEV_IMAGE_WM2 3
 #define FDEV_IMAGE_KEY 4
 
-static int dev_x = 374;
-static int dev_y = 32;
-
 t_fslist gamelist = { 
 			{"", SU_NONE}, 
 			{ "", "", "", "", ""}, 0, 
@@ -349,16 +346,6 @@ bool ButtonsCommon (int command, sMenuEntry * current)
 			
 
   }
-
-  if(controls.wpad1.bDown & WPAD_BUTTON_LEFT)
-    dev_x--;
-  if(controls.wpad1.bDown & WPAD_BUTTON_RIGHT)
-    dev_x++;
-  if(controls.wpad1.bDown & WPAD_BUTTON_UP)
-    dev_y--;
-  if(controls.wpad1.bDown & WPAD_BUTTON_DOWN)
-    dev_y++;
-
 
   //in pause search second wiimote
   if(WiimoteSetup(WPAD_CHAN_1) == WPAD_ERR_NONE)
@@ -765,7 +752,7 @@ void ShowMenu (int nMenu)
 
   //sprintf(debugt,"DEBUG: ROM(%s) - p(%i) n(%i) ", globalRom.filename, glistposition, WiiStatus.nRoms);
 
-  sprintf(debugt,"HELP: (A) LOAD ROM + AUTORUN d(%i,%i)", dev_x, dev_y);
+  sprintf(debugt,"HELP: (A) LOAD ROM + AUTORUN");
   PrintW (100, 400, debugt);
   sprintf(debugt,"      (B) ONLY LOAD ROM");
   PrintW (100, 410, debugt);
