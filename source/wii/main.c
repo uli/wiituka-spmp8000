@@ -142,6 +142,7 @@ void DevicesInit(void)
   else
   {
         WiiStatus.Dev_Fat = 1;
+
         Wiituka_LoadCFG("fat3:");
 
         printf("."); 
@@ -397,7 +398,7 @@ void Wiituka_InitCFG(void)
     WiitukaXML.disablenet = 0;
 
     WiiStatus.Dev_Fat = -1;
-    WiiStatus.Dev_Keyb = -1; 
+    WiiStatus.Dev_Keyb = 0; 
     WiiStatus.Dev_Net = -1;
     WiiStatus.CurrentMenu = -1;
     WiiStatus.LoadDISK = 0;
