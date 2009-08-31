@@ -18,6 +18,8 @@
 #include <fat.h>
 #include <wiiuse/wpad.h>
 #include <ogc/lwp_watchdog.h>
+#include <asndlib.h>
+#include <mp3player.h>
 
 #include "grrlib/GRRLIB.h"
 #include "../global.h"
@@ -30,6 +32,8 @@
 #include "menu/explorer.h"
 #include "tcp/net.h"
 #include "wiixml.h"
+
+#include "sound/snd_defines.h"
 
 #include "../port/dskutils.h"
 
@@ -161,6 +165,7 @@ void DevicesInit(void)
 
 void doPowerOff()
 {
+
   doCleanUp();
 
   free(pbGPBuffer);
@@ -169,6 +174,8 @@ void doPowerOff()
   fatUnmount("sd:/");
   WPAD_Shutdown();
 
+  ASND_End();
+
   if (!!*(u32*)0x80001800) exit(1);
   else SYS_ResetSystem(SYS_RETURNTOMENU, 0, 0);
 
@@ -176,6 +183,14 @@ void doPowerOff()
 
 }
 
+void MP3Init (void)
+{
+	// Music!
+        ASND_Init();
+	MP3Player_Init();
+	MP3Player_PlayBuffer(intro_mp3, intro_mp3_size, NULL);
+
+}
 
 
 /******************************************
@@ -197,6 +212,8 @@ int main(int argc, char *argv[]) {
   WiimoteInit();
 
   DevicesInit();
+
+  MP3Init();
 
   ShowSplash ();
 

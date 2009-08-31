@@ -15,6 +15,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <asndlib.h>
+#include <mp3player.h>
 
 #include "../global.h"
 
@@ -78,9 +80,9 @@ static void * sfx_thread_func(void *arg) {
 
 		next_sb = sb ^ 1; //cambia el puntero
 
-                if (sfx_thread_paused)
-                        memset (sound_buffer[next_sb], 0, SFX_THREAD_FRAG_SIZE);
-                else
+                if (!sfx_thread_paused)
+                        //memset (sound_buffer[next_sb], 0, SFX_THREAD_FRAG_SIZE);
+                //else
                 {
 			if((pbSndStream + SFX_THREAD_FRAG_SIZE) >= pbSndBufferEnd){
                 		memcpy(sound_buffer[next_sb], pbSndStream, (pbSndBufferEnd-pbSndStream)); //copia del cpc al buffer
@@ -167,18 +169,40 @@ void StopSound ( int val ) {
 
 	sfx_thread_paused = val;
 
-}
+        //clean
+        memset (sound_buffer[0], 0, SFX_THREAD_FRAG_SIZE);
+        memset (sound_buffer[1], 0, SFX_THREAD_FRAG_SIZE);
 
-//indica a la emulacion el tamaño del buffer (x4)
+	switch(val)
+        {
+		case 1:
+			SoundClose();
+			break;	
+
+		case 0:
+			SoundInit();
+			break;
+	}
+
+}
 
 /*! \fn int SoundInit (void)
     \brief Funcion global de inicializacion de sonido.
-    \note Indica a la emulacion el tamaño del buffer (x4)
+
 */
-int SoundInit (void)
+void SoundInit (void)
 {
+  if (MP3Player_IsPlaying()) { MP3Player_Stop(); }
+
   Init_SoundSystem();
 
+}
+/*! \fn int SoundSetup (void)
+    \brief Funcion global de configuracion del sonido.
+    \note Indica a la emulacion el tamaño del buffer (x4)
+*/
+int SoundSetup (void)
+{
   return SFX_THREAD_FRAG_SIZE << 2;
 }
 

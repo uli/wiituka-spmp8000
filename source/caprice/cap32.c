@@ -2686,7 +2686,7 @@ int audio_init (void)
 {
    int n;
 
-   if((CPC.snd_buffersize = SoundInit()) == 0) {
+   if((CPC.snd_buffersize = SoundSetup() ) == 0) {
      for (n=0; n < 100; n++)
       fprintf(stdout, "\n\nAudio FAIL! (%i)\n", CPC.snd_buffersize);
 
@@ -3240,7 +3240,9 @@ void cpc_main (void)
 
    int iExitCondition = EC_FRAME_COMPLETE;
    
-   emu_paused(1);
+   //emu_paused(1);
+
+   CPC.paused = 1;
 
    #if 0
     strcpy((char *) spoolkeys.contenido, (char *) "border 3");

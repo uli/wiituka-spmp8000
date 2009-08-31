@@ -49,4 +49,6 @@ extern const u8 button_emu_snap_png[];
 extern const u8 button_emu_snap_save_png[];
 extern const u8 button_emu_snap_load_png[];
 
+extern const u8 splashwii_png[];
+
 #endif

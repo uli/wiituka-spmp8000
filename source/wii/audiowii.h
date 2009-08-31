@@ -20,7 +20,8 @@
  */
 
 
-int SoundInit (void);
+void SoundInit (void);
+int SoundSetup (void);
 void StopSound ( int val );
 void SoundClose(void);
 

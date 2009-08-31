@@ -24,7 +24,7 @@ include $(DEVKITPPC)/wii_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	wiituka
 BUILD		:=	build
-SOURCES		:=	source/wii source/caprice source/port source/wii/gfx source/wii/libpng source/wii/libpng/pngu source/wii/grrlib source/wii/menu source/wii/wpad_leds source/wii/tcp source/wii/images source/wii/fonts
+SOURCES		:=	source/wii source/caprice source/port source/wii/gfx source/wii/libpng source/wii/libpng/pngu source/wii/grrlib source/wii/menu source/wii/wpad_leds source/wii/tcp source/wii/images source/wii/fonts source/wii/sound
 DATA		:=	data  
 INCLUDES	:=      
 
@@ -46,7 +46,7 @@ CXXFLAGS = $(CFLAGS)
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS	:=	 -lpng -lz -lfat -lwiiuse -lmxml -lbte -logc -lm -lwiikeyboard -lfreetype
+LIBS	:=	 -lmad -lasnd -lpng -lz -lfat -lwiiuse -lmxml -lbte -logc -lm -lwiikeyboard -lfreetype
 
 # -lSDL 
 #---------------------------------------------------------------------------------
@@ -79,6 +79,7 @@ SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.S)))
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
 TTFFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.ttf)))
 PNGFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.png)))
+MP3FILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.mp3)))
 
 #---------------------------------------------------------------------------------
 # use CXX for linking C++ projects, CC for standard C
@@ -92,7 +93,7 @@ endif
 export OFILES	:=	$(addsuffix .o,$(BINFILES)) \
 					$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) \
 					$(sFILES:.s=.o) $(SFILES:.S=.o) \
-					$(TTFFILES:.ttf=.ttf.o) $(PNGFILES:.png=.png.o)
+					$(TTFFILES:.ttf=.ttf.o) $(PNGFILES:.png=.png.o) $(MP3FILES:.mp3=.mp3.o)
 
 #---------------------------------------------------------------------------------
 # build a list of include paths
@@ -150,6 +151,10 @@ $(OUTPUT).elf: $(OFILES)
 	$(bin2o)
 	
 %.png.o : 	%.png
+	@echo $(notdir $<)
+	$(bin2o)
+
+%.mp3.o :	%.mp3
 	@echo $(notdir $<)
 	$(bin2o)
 

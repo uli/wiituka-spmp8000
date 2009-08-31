@@ -18,6 +18,7 @@
 #include <math.h>
 #include <gccore.h>
 #include <wiiuse/wpad.h>
+#include <mp3player.h>
 
 #include "../../global.h"
 #include "../../port/dskutils.h"
@@ -45,6 +46,7 @@ extern xmlWiiCFG WiitukaXML;
 
 t_element cursor;
 t_img fondo;
+t_img fondo_compo;
 t_img keyb;
 t_element keyb_help;
 t_element b_floppy;
@@ -134,11 +136,19 @@ bool WelcomeScreen (int command)
 	    fprintf( stderr, "Init Splash failed \n");
 	    return false;
 	  }
+
+	  if( !LoadTexture( &fondo_compo, splashwii_png) )
+	  {
+	    fprintf( stderr, "Init Splash failed \n");
+	    return false;
+	  }
+
 	break;
 
 	case UNLOAD:
 	  //liberamos anterior.
 	  FreeImg(&fondo);
+	  FreeImg(&fondo_compo);
 	break;
 
   }
@@ -693,6 +703,12 @@ void ShowSplash (void)
 
   WelcomeScreen (LOAD);
   bool ended = false;
+
+  DrawTexture(&fondo_compo, 0, 0, 0, 1, 1, 255);
+  UpdateScreen();
+
+  sleep(3);
+  MP3Player_Volume(200);
 
   while( !ended )
   {

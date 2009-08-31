@@ -229,8 +229,9 @@ void FillScreen( int Updated );
 void UpdateScreen (void);
 
 void AudioPlayer( void );
-int SoundInit (void);
+void SoundInit (void);
 void SoundClose (void);
+int SoundSetup (void);
 void StopSound (int val);
 
 void ShowMenu (int nMenu);
