@@ -18,6 +18,7 @@
 #include <math.h>
 #include <gccore.h>
 #include <wiiuse/wpad.h>
+#include <asndlib.h>
 #include <mp3player.h>
 
 #include "../../global.h"
@@ -30,6 +31,7 @@
 #include "explorer.h"
 
 #include "../images/gfx_defines.h"
+#include "../sound/snd_defines.h"
 
 #include "../tcp/net.h"
 #include "../grrlib/GRRLIB.h"
@@ -671,6 +673,8 @@ void MenuClose(void)
 
    Cursor_Free(&cursor);
 
+   if (MP3Player_IsPlaying()) { MP3Player_Stop(); }
+
 }
 
 void ShowDevicesStatus(void)
@@ -707,7 +711,7 @@ void ShowSplash (void)
   DrawTexture(&fondo_compo, 0, 0, 0, 1, 1, 255);
   UpdateScreen();
 
-  sleep(3);
+  sleep(5);
   MP3Player_Volume(200);
 
   while( !ended )
@@ -751,6 +755,34 @@ void ShowWait (void)
 
 }
 
+u32 music_select = 0;
+u32 music_timer = 0;
+
+void PlayBgMusic (void)
+{
+
+   //static u32 music_timer = 0;
+
+   if (MP3Player_IsPlaying())
+   {
+       music_timer = GetTicks();
+       return;
+   }
+
+   if((GetTicks() - music_timer) > 10000)
+   {
+        music_select = (rand()%10);
+
+        if( music_select > 4)
+	    MP3Player_PlayBuffer(bckg_a_mp3, bckg_a_mp3_size, NULL);
+	else
+	    MP3Player_PlayBuffer(bckg_b_mp3, bckg_b_mp3_size, NULL);
+
+   }
+   
+ 
+}
+
 void ShowMenu (int nMenu)
 {
 
@@ -772,7 +804,7 @@ void ShowMenu (int nMenu)
   PrintW (100, 400, debugt);
   sprintf(debugt,"      (B) ONLY LOAD ROM");
   PrintW (100, 410, debugt);
-  sprintf(debugt,"Wiituka v0.98.7");
+  sprintf(debugt,"Wiituka v0.98.7 - T: %u S: %u", music_timer, music_select );
   PrintW (20, 450, debugt);
 
   ButtonsCommon(PAINT, menuCurrent);
@@ -780,6 +812,8 @@ void ShowMenu (int nMenu)
   ButtonsCommon(CHECK, menuCurrent);
 
   ShowDevicesStatus();
+
+  PlayBgMusic();
 
   Element_Paint(&cursor);
 

@@ -110,7 +110,8 @@ void Init_SoundSystem( void ) {
 	sfx_thread_running = false;
 	sfx_thread_quit = false;
 
-	AUDIO_Init(0);
+	//Init in aSndlib
+	//AUDIO_Init(0);
 
 	memset(sfx_stack, 0, SFX_THREAD_STACKSIZE);
 
@@ -133,7 +134,8 @@ void Init_SoundSystem( void ) {
 	DCFlushRange(sound_buffer[0], SFX_THREAD_FRAG_SIZE);
 	DCFlushRange(sound_buffer[1], SFX_THREAD_FRAG_SIZE);
 
-	AUDIO_SetDSPSampleRate(AI_SAMPLERATE_48KHZ);
+	//Init in aSndlib
+	//AUDIO_SetDSPSampleRate(AI_SAMPLERATE_48KHZ);
 	AUDIO_RegisterDMACallback(audio_switch_buffers);
 
 	audio_switch_buffers();
@@ -146,6 +148,7 @@ void Init_SoundSystem( void ) {
 void Close_SoundSystem( void ) {
 
 	AUDIO_StopDMA();
+        usleep(100);
 	AUDIO_RegisterDMACallback(NULL);
 
 	if (sfx_thread_running) {
@@ -158,6 +161,7 @@ void Close_SoundSystem( void ) {
 		sfx_thread_running = false;
 
 	}
+
 }
 
 /*! \fn void StopSound ( int val )
@@ -177,9 +181,19 @@ void StopSound ( int val ) {
         {
 		case 1:
 			SoundClose();
+	     	        ASND_Init();
+			//needed by mp3player
+			SND_Pause(0);
+ 			SND_StopVoice(0);
+
 			break;	
 
 		case 0:
+		        if (MP3Player_IsPlaying()) { 
+			    MP3Player_Stop(); 
+                        }
+		        ASND_End();
+
 			SoundInit();
 			break;
 	}
@@ -192,7 +206,6 @@ void StopSound ( int val ) {
 */
 void SoundInit (void)
 {
-  if (MP3Player_IsPlaying()) { MP3Player_Stop(); }
 
   Init_SoundSystem();
 
@@ -211,6 +224,7 @@ int SoundSetup (void)
 */
 void SoundClose(void) 
 {
-  Close_SoundSystem() ;
+  Close_SoundSystem();
+
 }
 

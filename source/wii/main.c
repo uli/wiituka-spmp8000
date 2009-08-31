@@ -158,6 +158,8 @@ void DevicesInit(void)
             WiiStatus.Dev_Net = 0;
   }
 
+  srand(GetTicks());
+
   printf(" .\n"); 
 
 }
@@ -185,7 +187,7 @@ void doPowerOff()
 
 void MP3Init (void)
 {
-	// Music!
+	// Splash Music!!
         ASND_Init();
 	MP3Player_Init();
 	MP3Player_PlayBuffer(intro_mp3, intro_mp3_size, NULL);
