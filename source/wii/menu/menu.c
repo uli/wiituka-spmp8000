@@ -371,6 +371,7 @@ bool ButtonsCommon (int command, sMenuEntry * current)
   	else if((controls.wpad1.bDown & (WPAD_BUTTON_RIGHT|WPAD_BUTTON_PLUS)) && ((glistposition + ROWS_PER_SCREEN) < (WiiStatus.nRoms)))
 		{
 			menuthread_callanimButtons(0, current);
+   if (MP3Player_IsPlaying()) { MP3Player_Stop(); }
 		}
   }
 
@@ -755,13 +756,12 @@ void ShowWait (void)
 
 }
 
-u32 music_select = 0;
-u32 music_timer = 0;
-
+char music_string[255] = {""};
+int  music_banner = 640; 
 void PlayBgMusic (void)
 {
 
-   //static u32 music_timer = 0;
+   static u32 music_timer = 0;
 
    if (MP3Player_IsPlaying())
    {
@@ -769,15 +769,37 @@ void PlayBgMusic (void)
        return;
    }
 
-   if((GetTicks() - music_timer) > 10000)
+   if((GetTicks() - music_timer) > 15000)
    {
-        music_select = (rand()%10);
+        u32 music_rand = (rand()%4) + 1;
 
-        if( music_select > 4)
+        
+        switch(music_rand)
+	{
+	   case 1:
 	    MP3Player_PlayBuffer(bckg_a_mp3, bckg_a_mp3_size, NULL);
-	else
-	    MP3Player_PlayBuffer(bckg_b_mp3, bckg_b_mp3_size, NULL);
+            strcpy(music_string, "Music by Cesar Astudillo (Gominolas) of the game Titanic");
+            break;
 
+	   case 2:
+	    MP3Player_PlayBuffer(bckg_b_mp3, bckg_b_mp3_size, NULL);
+            strcpy(music_string, "Music by Cerror - A beginning");
+            break;
+
+	   case 3:
+	    MP3Player_PlayBuffer(bckg_c_mp3, bckg_c_mp3_size, NULL);
+            strcpy(music_string, "Music by Ultrasyd - Lost in Fractal Dimension");
+            break;
+
+	   case 4:
+	    MP3Player_PlayBuffer(bckg_d_mp3, bckg_d_mp3_size, NULL);
+            strcpy(music_string, "Music by Fenyx Kell - Solarium");
+            break;
+
+
+        }
+         
+        music_banner = 640; 
    }
    
  
@@ -804,8 +826,15 @@ void ShowMenu (int nMenu)
   PrintW (100, 400, debugt);
   sprintf(debugt,"      (B) ONLY LOAD ROM");
   PrintW (100, 410, debugt);
-  sprintf(debugt,"Wiituka v0.98.7 - T: %u S: %u", music_timer, music_select );
+  sprintf(debugt,"Wiituka v0.98.8" );
   PrintW (20, 450, debugt);
+
+  if(music_banner > -640)
+  {
+          music_banner--;
+	  sprintf(debugt,"%s", music_string );
+	  PrintW (40+music_banner, 435, debugt);
+  }
 
   ButtonsCommon(PAINT, menuCurrent);
 

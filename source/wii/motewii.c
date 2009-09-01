@@ -402,6 +402,17 @@ void poll_wiimote(void)
 
 		if( (WiiStatus.Gunstick == false) ) {
 		 	if(screen_y){
+				if ((controls.wpad1.bDown & WPAD_BUTTON_A)&&(controls.wpad1.bDown & WPAD_BUTTON_B))
+				{
+			  	    spool = 1;
+		  		    sprintf(spool_cad, " BINDS CLEANED...");
+				    int n;
+				    for(n = 0; n < MAX_CPCBUTTONS; n++){
+					    controls.wpad1.pad[n].cpcval = buttons_def[n];
+					    controls.wpad2.pad[n].cpcval = buttons_def[n + MAX_CPCBUTTONS];
+				    }
+				}
+
                   		if ((controls.wpad1.bDown & WPAD_BUTTON_A)){
                        			KeyboardCheck(KEY_DOWN); //comprueba tecla
 		  		}else if(controls.wpad1.bUp & WPAD_BUTTON_A){
