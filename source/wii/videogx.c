@@ -20,7 +20,7 @@
 #include <wiiuse/wpad.h>
 #include <fat.h>
 
-#include "libpng/pngu/pngu.h"
+#include "libpngu/pngu.h"
 #include "grrlib/GRRLIB.h"
 #include "grrlib/GRRLIB_font1.h" //printf font
 

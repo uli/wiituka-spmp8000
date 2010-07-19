@@ -14,7 +14,7 @@
 #include <math.h>
 #include <gccore.h>
 
-#include "../libpng/pngu/pngu.h"
+#include "../libpngu/pngu.h"
 
 extern Mtx GXmodelView2D;
 
@@ -26,13 +26,13 @@ extern void *GRRLIB_TextToTexture(const char *string, unsigned int fontSize, uns
 void GRRLIB_FillScreen(u32 color);
 
 void GRRLIB_Plot(f32 x,f32 y, u32 color);
-void GRRLIB_NPlot(Vector v[],GXColor c[],long n);
+void GRRLIB_NPlot(guVector v[],GXColor c[],long n);
 
 void GRRLIB_Line(f32 x1, f32 y1, f32 x2, f32 y2, u32 color);
 
 void GRRLIB_Rectangle(f32 x, f32 y, f32 width, f32 height, u32 color, u8 filled);
-void GRRLIB_NGone(Vector v[],GXColor c[],long n);
-void GRRLIB_NGoneFilled(Vector v[],GXColor c[],long n);
+void GRRLIB_NGone(guVector v[],GXColor c[],long n);
+void GRRLIB_NGoneFilled(guVector v[],GXColor c[],long n);
 
 
 /*
@@ -57,7 +57,7 @@ void GRRLIB_Printf_ORG(f32 xpos, f32 ypos, u8 data[], u32 color, u16 charWidth, 
 
 GXColor GRRLIB_Splitu32(u32 color);
 
-void GRRLIB_GXEngine(Vector v[], GXColor c[], long count,u8 fmt);
+void GRRLIB_GXEngine(guVector v[], GXColor c[], long count,u8 fmt);
 
 
 void GRRLIB_InitVideo ();

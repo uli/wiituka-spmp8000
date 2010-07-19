@@ -24,7 +24,7 @@ include $(DEVKITPPC)/wii_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	wiituka
 BUILD		:=	build
-SOURCES		:=	source/wii source/caprice source/port source/wii/gfx source/wii/libpng source/wii/libpng/pngu source/wii/grrlib source/wii/menu source/wii/wpad_leds source/wii/tcp source/wii/images source/wii/fonts source/wii/sound
+SOURCES		:=	source/wii source/caprice source/port source/wii/gfx source/wii/libpngu source/wii/grrlib source/wii/menu source/wii/wpad_leds source/wii/tcp source/wii/images source/wii/fonts source/wii/sound
 DATA		:=	data  
 INCLUDES	:=      
 

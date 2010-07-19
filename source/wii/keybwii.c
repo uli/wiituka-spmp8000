@@ -72,7 +72,7 @@ int KeyboardInit (void)
 {
   s32 ret = 0;
 
-  ret = KEYBOARD_Init();
+  ret = KEYBOARD_Init(NULL);
   
   return ret;
 
