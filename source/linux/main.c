@@ -47,8 +47,8 @@ void close_buffer (void);
 
 /* GLOBALES */
 bool GPChangeDISK;
-PituKa_CFG configuracion; 
-//bool WiiChangeDISK;
+WiituKa_Status WiiStatus;
+xmlWiiCFG WiitukaXML;
 t_WiiRom globalRom;
 
 Wii_gun gunstick;
@@ -223,7 +223,7 @@ int poll_input (void) {
 
         switch (event.type) {
 	    case SDL_MOUSEBUTTONUP:
-                  WiiChangeDISK = true;
+                  WiiStatus.LoadDISK = 2;
             	  strcpy(rom_name, "../../shinobi.zip"); 
                   printf("ROM: %s\n", rom_name);
 		  emu_paused (1);
@@ -234,7 +234,8 @@ int poll_input (void) {
                   cpc_key = event2key(event); // translate the PC key to a CPC key
                   if (cpc_key != 0xff) {
                      keyboard_matrix[cpc_key >> 4] &= ~bit_values[cpc_key & 7]; // key is being held down
-                  }                break;
+                  }
+                break;
             case SDL_KEYUP:
                   cpc_key = event2key(event); // translate the PC key to a CPC key
                   if (cpc_key != 0xff) {
@@ -259,6 +260,8 @@ int main(int argc, char *argv[]) {
    if(!init_linux())
      return 1;
 
+   SoundInit();
+
    if(!init_buffer())
      return 2;
 
@@ -272,7 +275,7 @@ int main(int argc, char *argv[]) {
             strncpy(rom_name, &argv[i][0], sizeof(rom_name)-1); // take it as is
          }
          printf("ROM: %s\n", rom_name);
- 	 WiiChangeDISK = true;
+ 	 WiiStatus.LoadDISK = 2;
       }
   }
 
@@ -290,6 +293,7 @@ int load_rom(t_WiiRom * romfs)
    int fileSize = 0;
    void * fbuffer = NULL;
    FILE *pfile;
+
 
           strcpy(romfs->filename, rom_name);
 
@@ -384,7 +388,12 @@ int audio_align_samples (int given)
 
 void StopSound ( int val ) {      SDL_PauseAudio(val);  }
 
-int SoundInit (void)
+int SoundSetup (void)
+{
+  return audio_spec->size;
+}
+
+void SoundInit (void)
 {
 
    SDL_AudioSpec *desired, *obtained;
@@ -396,20 +405,21 @@ int SoundInit (void)
    desired->format = AUDIO_S16LSB;
    desired->channels = 2;
    desired->samples = audio_align_samples(desired->freq / 50); // desired is 20ms at the given frequency
+
    desired->callback = SoundUpdate;
    desired->userdata = NULL;
 
    if (SDL_OpenAudio(desired, obtained) < 0) {
       fprintf(stderr, "Could not open audio: %s\n", SDL_GetError());
-      return 0;
+      return;
    }
 
    free(desired);
    audio_spec = obtained;
 
- //  printf("AUDIO - S: %i\n",audio_spec->size);
+   printf("AUDIO - S: %i\n",audio_spec->size);
 
-   return audio_spec->size; // size is samples * channels * bytes per sample (1 or 2)
+   //return audio_spec->size; // size is samples * channels * bytes per sample (1 or 2)
 
 }
 

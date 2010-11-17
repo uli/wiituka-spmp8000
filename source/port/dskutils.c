@@ -552,6 +552,7 @@ void doPowerOff();
 
 bool mountDev ( enum support_type dev, bool remount)
 {
+#ifdef GEKKO
     char fsys[10]="";
     char device[10]="";
 
@@ -598,7 +599,7 @@ bool mountDev ( enum support_type dev, bool remount)
 
 
     return true;
-
+#endif
 }
 
 
