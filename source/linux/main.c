@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------------
 
-	PITUKA TEST (LINUX BUILD)
-	LINUX WINDOW ONLY - FOR DEBUG
+    PITUKA TEST (LINUX BUILD)
+    LINUX WINDOW ONLY - FOR DEBUG
 
 ---------------------------------------------------------------------------------*/
 
@@ -78,377 +78,364 @@ extern Bitu8 * pbGPBuffer;
 
 static int init_linux (void)
 {
+    if(SDL_Init(SDL_INIT_VIDEO |SDL_INIT_AUDIO) < 0) //| SDL_INIT_JOYSTICK
+        return 0;
 
-  if(SDL_Init(SDL_INIT_VIDEO |SDL_INIT_AUDIO) < 0) //| SDL_INIT_JOYSTICK
-     return 0;
+    screen = SDL_SetVideoMode(WRES, HRES, 16, SDL_SWSURFACE);
+    if (!screen) {
+        fprintf(stderr, "Couldn't set video mode: %s\n", SDL_GetError());
+        return 0;
+    }
 
-  screen = SDL_SetVideoMode(WRES, HRES, 16, SDL_SWSURFACE);
-  if (!screen) {
-      fprintf(stderr, "Couldn't set video mode: %s\n", SDL_GetError());
-      return 0;
-  }
+    SDL_JoystickOpen(0);
+    SDL_ShowCursor(SDL_DISABLE);
 
-  SDL_JoystickOpen(0);
-  SDL_ShowCursor(SDL_DISABLE);
+    if (SDL_MUSTLOCK(screen)) {
+        SDL_LockSurface(screen);
+    }
 
-  if (SDL_MUSTLOCK(screen)) {
-      SDL_LockSurface(screen);
-  }
+    screen_bps = screen->pitch / 4; // rendered screen line length (changing bytes to dwords)
+    screen_base = (Bitu16 *)screen->pixels; // memory address of back buffer
+    if (SDL_MUSTLOCK(screen)) {
+        SDL_UnlockSurface(screen);
+    }
 
-  screen_bps = screen->pitch / 4; // rendered screen line length (changing bytes to dwords)
-  screen_base = (Bitu16 *)screen->pixels; // memory address of back buffer
-  if (SDL_MUSTLOCK(screen)) {
-    SDL_UnlockSurface(screen);
-  }
-
- // printf("Pitch: %u\n", screen_bps);
-  return 1;
-
+    return 1;
 }
 
 inline void linux_draw_bit (Bitu16 *p, Bitu8 v)
 {
-  *p = pituka_pal[v];
+    *p = pituka_pal[v];
 }
 
 
 void CleanScreen (void)
 {
-  SDL_FillRect(screen,NULL,SDL_MapRGB(screen->format,0,0,0));
-  SDL_Flip(screen);
+    SDL_FillRect(screen,NULL,SDL_MapRGB(screen->format,0,0,0));
+    SDL_Flip(screen);
 }
 
 void UpdateScreen (void) 
 {
-//  Uint32 color = SDL_MapRGB(screen->format, 0, 55, 55); //Convierto color
-  register int x;
-  Bitu16 *dest = NULL, *src = NULL;
+    register int x;
+    Bitu16 *dest = NULL, *src = NULL;
 
-  if (SDL_MUSTLOCK(screen)) {
-    if ( SDL_LockSurface(screen) < 0 ){ //Bloqueo el Surface
-      //Si da 0 o -1 no puede bloquear el surface
-      return;
+    if (SDL_MUSTLOCK(screen)) {
+        if ( SDL_LockSurface(screen) < 0 ){ //Bloqueo el Surface
+            return;
+        }
     }
-  }
 
-  dest = (Bitu16*) (screen_base + 0);
-  src = (Bitu16*) (pix + 0);
+    dest = (Bitu16*) (screen_base + 0);
+    src = (Bitu16*) (pix + 0);
 
-  for (x=0; x < WRES*HRES ; x++)
+    for (x=0; x < WRES*HRES ; x++)
     *(dest++) = (Bitu16) *(src++);
 
 
-  if (SDL_MUSTLOCK(screen)) {
-    SDL_UnlockSurface(screen);
-  }
+    if (SDL_MUSTLOCK(screen)) {
+        SDL_UnlockSurface(screen);
+    }
 
-  SDL_Flip(screen);
-
+    SDL_Flip(screen);
 }
 
 #define CENTRADO_LOGO 32
 
 void FillScreenPal ( unsigned char * surface )
-{     
-      Bitu8 * src = surface;
-      //int y, yLine;
-      Bitu16 *dest = NULL;
-      register int x, y;
+{
+    Bitu8 * src = surface;
+    Bitu16 *dest = NULL;
+    register int x, y;
 
-       dest = (Bitu16*) (pix + WRES*CENTRADO_LOGO);
+    dest = (Bitu16*) (pix + WRES*CENTRADO_LOGO);
 
-       for(y=0; y < 240; y++){ //tamaño del logo original 320x240
-         dest+=CENTRADO_LOGO; 
-         for (x=0; x < 320 ; x++)
-	     linux_draw_bit((Bitu16*)dest++, *(src++));
-         dest+=CENTRADO_LOGO; 
-       }
-          
+    for(y=0; y < 240; y++){ //tamaño del logo original 320x240
+        dest+=CENTRADO_LOGO; 
 
+        for (x=0; x < 320 ; x++)
+            linux_draw_bit((Bitu16*)dest++, *(src++));
+
+        dest+=CENTRADO_LOGO; 
+    }
 }
-
 
 void FillScreenBuffer ( void * surface ) 
 {
+    Bitu8 * src = surface;
+    Bitu16 *dest = NULL;
+    register int x;
 
-      Bitu8 * src = surface;
-      //int y, yLine;
-      Bitu16 *dest = NULL;
-      register int x;
+    dest = (Bitu16*) (pix + 0);
 
-       dest = (Bitu16*) (pix + 0);
+    for (x=0; x < HRES*WRES ; x++)
+        *(dest++) = (Bitu16) *(src++);
 
-       for (x=0; x < HRES*WRES ; x++)
-            *(dest++) = (Bitu16) *(src++);
-          
 }
+
 void FillScreen( int Updated )
-{     
-  //actualizado directamente en emulacion
+{
+    //actualizado directamente en emulacion
 }
 
 Bitu8 event2key (SDL_Event event)
 {
-   if (event.key.keysym.sym>=320) {
-      return 0xff;
-   } else {
-      return keyboard_translation[event.key.keysym.sym];
-   }
+    if (event.key.keysym.sym>=320) {
+        return 0xff;
+    } else {
+        return keyboard_translation[event.key.keysym.sym];
+    }
 }
 
 
-int linux_input (void) {
-
+int linux_input (void)
+{
     SDL_Event event;
 
     while(SDL_PollEvent(&event)){
 
         switch (event.type) {
-	    case SDL_KEYDOWN:
+            case SDL_KEYDOWN:
             case SDL_JOYBUTTONDOWN:
-	    case SDL_QUIT:
+            case SDL_QUIT:
                 return 1;
                 break;
         }
     }
+
     return 0;
 }
 
-int poll_input (void) {
+int poll_input (void) 
+{
+    SDL_Event event;
+    Bitu8 cpc_key;
 
-     SDL_Event event;
-     Bitu8 cpc_key;
-
-     while(SDL_PollEvent(&event)){
+    while(SDL_PollEvent(&event)){
 
         switch (event.type) {
-	    case SDL_MOUSEBUTTONUP:
-                  WiiStatus.LoadDISK = 2;
-            	  strcpy(rom_name, "../../shinobi.zip"); 
-                  printf("ROM: %s\n", rom_name);
-		  emu_paused (1);
-  		  emulator_reset(true);
-		  break;
+            case SDL_MOUSEBUTTONUP:
+                WiiStatus.LoadDISK = 2;
+                strcpy(rom_name, "../../shinobi.zip");
+                printf("ROM: %s\n", rom_name);
+                emu_paused (1);
+                emulator_reset(true);
+                break;
 
-	    case SDL_KEYDOWN:
-                  cpc_key = event2key(event); // translate the PC key to a CPC key
-                  if (cpc_key != 0xff) {
-                     keyboard_matrix[cpc_key >> 4] &= ~bit_values[cpc_key & 7]; // key is being held down
-                  }
+            case SDL_KEYDOWN:
+                cpc_key = event2key(event); // translate the PC key to a CPC key
+                if (cpc_key != 0xff) {
+                    keyboard_matrix[cpc_key >> 4] &= ~bit_values[cpc_key & 7]; // key is being held down
+                }
                 break;
             case SDL_KEYUP:
-                  cpc_key = event2key(event); // translate the PC key to a CPC key
-                  if (cpc_key != 0xff) {
-                        keyboard_matrix[cpc_key >> 4] |= bit_values[cpc_key & 7]; // key has been released
-                  }
+                cpc_key = event2key(event); // translate the PC key to a CPC key
+                if (cpc_key != 0xff) {
+                    keyboard_matrix[cpc_key >> 4] |= bit_values[cpc_key & 7]; // key has been released
+                }
                 break;
 
-	     case SDL_QUIT:
-			emuDone = 1;
-		break;
-
+            case SDL_QUIT:
+                emuDone = 1;
+                break;
         }
     }
-
     return 0;
+
 }
 
 
 int main(int argc, char *argv[]) {
-  int i,length;
+    int i,length;
 
-   if(!init_linux())
-     return 1;
+    if(!init_linux())
+        return 1;
 
-   SoundInit();
+    SoundInit();
 
-   if(!init_buffer())
-     return 2;
+    if(!init_buffer())
+        return 2;
 
-   for (i = 1; i < argc; i++) { // loop for all command line arguments
-      length = strlen(argv[i]);
-      if (length > 5 && length < 256) { // minumum for a valid filename
-         if (argv[i][0] == '"') { // argument passed with quotes?
-            length -= 2;
-            strncpy(rom_name, &argv[i][1], length); // strip the quotes
-         } else {
-            strncpy(rom_name, &argv[i][0], sizeof(rom_name)-1); // take it as is
-         }
-         printf("ROM: %s\n", rom_name);
- 	 WiiStatus.LoadDISK = 2;
-      }
-  }
+    for (i = 1; i < argc; i++) { // loop for all command line arguments
+        length = strlen(argv[i]);
+        if (length > 5 && length < 256) // minumum for a valid filename
+        {
+            if (argv[i][0] == '"') { // argument passed with quotes?
+                length -= 2;
+                strncpy(rom_name, &argv[i][1], length); // strip the quotes
+            }
+            else
+                strncpy(rom_name, &argv[i][0], sizeof(rom_name)-1); // take it as is
 
-  cpc_main();
+            printf("ROM: %s\n", rom_name);
+            WiiStatus.LoadDISK = 2;
+        }
+    }
 
-  close_buffer();
+    cpc_main();
 
-  SDL_Quit();
+    close_buffer();
 
-  return 0;
+    SDL_Quit();
+
+    return 0;
 }
 
 int load_rom(t_WiiRom * romfs)
 {
-   int fileSize = 0;
-   void * fbuffer = NULL;
-   FILE *pfile;
+    int fileSize = 0;
+    void * fbuffer = NULL;
+    FILE *pfile;
 
+    strcpy(romfs->filename, rom_name);
 
-          strcpy(romfs->filename, rom_name);
-
-	  if(!(pfile = fopen(romfs->filename, "rb"))){
-	        spool = 1;
-	    	sprintf(spool_cad, " LOAD ROM: ERROR (%s)", romfs->filename);
-		return false;
-	  }
-
-	  fseek(pfile, 0, SEEK_END);
-	  fileSize = ftell(pfile);
-	  rewind(pfile);
-
-	  fbuffer = (void *) malloc(fileSize); 
-
-	  if(fbuffer == NULL){
-	        spool = 1;
-	    	sprintf(spool_cad, " LOAD ROM: NO MEMORY (%i)", fileSize);
-	        fclose(pfile);
-		return false;
-	  }
-
-	  if(!fread(fbuffer, 1, fileSize, pfile)){
-		free(fbuffer);
-		fclose(pfile);
-	        spool = 1;
-	    	sprintf(spool_cad, " LOAD ROM: NO READED? (%s)", romfs->filename);
-		return false;
-	  }
-
-	  fclose(pfile);
-
-  bool result = false;
-
-  if(!(result = loadBuffered_rom (fbuffer, fileSize))){
+    if(!(pfile = fopen(romfs->filename, "rb")))
+    {
         spool = 1;
-    	sprintf(spool_cad, " LOAD BUFFER ROM: BAD? (%s)", romfs->filename);
-  }
- 
-  free(fbuffer);
+        sprintf(spool_cad, " LOAD ROM: ERROR (%s)", romfs->filename);
+        return false;
+    }
 
-  return result;
+    fseek(pfile, 0, SEEK_END);
+    fileSize = ftell(pfile);
+    rewind(pfile);
+
+    fbuffer = (void *) malloc(fileSize); 
+
+    if(fbuffer == NULL)
+    {
+        spool = 1;
+        sprintf(spool_cad, " LOAD ROM: NO MEMORY (%i)", fileSize);
+        fclose(pfile);
+        return false;
+    }
+
+    if(!fread(fbuffer, 1, fileSize, pfile))
+    {
+        free(fbuffer);
+        fclose(pfile);
+        spool = 1;
+        sprintf(spool_cad, " LOAD ROM: NO READED? (%s)", romfs->filename);
+        return false;
+    }
+
+    fclose(pfile);
+
+    bool result = false;
+
+    if(!(result = loadBuffered_rom (fbuffer, fileSize)))
+    {
+        spool = 1;
+        sprintf(spool_cad, " LOAD BUFFER ROM: BAD? (%s)", romfs->filename);
+    }
+
+    free(fbuffer);
+
+    return result;
 }
 
-unsigned int GetTicks(void) { return (unsigned int) SDL_GetTicks(); }
+unsigned int GetTicks(void)
+{
+    return (unsigned int) SDL_GetTicks();
+}
 
 int init_buffer (void)
 {
+    pbGPBuffer = (Bitu8*) malloc(128*1024); //need by unzip lib
 
-  pbGPBuffer = (Bitu8*) malloc(128*1024); //need by unzip lib
+    pix = (void *)malloc(4 * WRES * HRES);
+    if(pix == NULL)
+        return 0;
 
-  pix = (void *)malloc(4 * WRES * HRES);
-  if(pix == NULL)
-      return 0;
-
-  return 1;
+    return 1;
 }
 
 void close_buffer (void)
 {
-  if(pix != NULL)
+    if(pix != NULL)
     {
-      free(pix);
-      pix = NULL;
+        free(pix);
+        pix = NULL;
     }
 
-  free(pbGPBuffer);
+    free(pbGPBuffer);
 }
 
-
+/*
+   SND DEBUG CODE
+*/
 
 void SoundUpdate (void *userdata, Bitu8 *stream, int len)
 {
-   memcpy(stream, pbSndStream, len);
-   pbSndStream += len;
-   if (pbSndStream >= pbSndBufferEnd) {
-      pbSndStream = pbSndBuffer;
-   }
-}
+    memcpy(stream, pbSndStream, len);
+    pbSndStream += len;
 
+    if (pbSndStream >= pbSndBufferEnd) 
+        pbSndStream = pbSndBuffer;
+}
 
 int audio_align_samples (int given)
 {
-   int actual = 1;
+    int actual = 1;
 
-   while (actual < given) {
-      actual <<= 2;
-   }
+    while (actual < given) {
+        actual <<= 2;
+    }
 
-   return actual; // return the closest match as 2^n
+    return actual; // return the closest match as 2^n
 }
 
-void StopSound ( int val ) {      SDL_PauseAudio(val);  }
+void StopSound ( int val )
+{
+    SDL_PauseAudio(val);  
+}
 
 int SoundSetup (void)
 {
-  return audio_spec->size;
+    return audio_spec->size; // size is samples * channels * bytes per sample (1 or 2)
 }
 
 void SoundInit (void)
 {
+    SDL_AudioSpec *desired, *obtained;
 
-   SDL_AudioSpec *desired, *obtained;
+    desired = (SDL_AudioSpec *)malloc(sizeof(SDL_AudioSpec));
+    obtained = (SDL_AudioSpec *)malloc(sizeof(SDL_AudioSpec));
 
-   desired = (SDL_AudioSpec *)malloc(sizeof(SDL_AudioSpec));
-   obtained = (SDL_AudioSpec *)malloc(sizeof(SDL_AudioSpec));
+    desired->freq = 48000;
+    desired->format = AUDIO_S16LSB;
+    desired->channels = 2;
+    desired->samples = audio_align_samples(desired->freq / 50); // desired is 20ms at the given frequency
 
-   desired->freq = 48000;
-   desired->format = AUDIO_S16LSB;
-   desired->channels = 2;
-   desired->samples = audio_align_samples(desired->freq / 50); // desired is 20ms at the given frequency
+    desired->callback = SoundUpdate;
+    desired->userdata = NULL;
 
-   desired->callback = SoundUpdate;
-   desired->userdata = NULL;
+    if (SDL_OpenAudio(desired, obtained) < 0) 
+    {
+        fprintf(stderr, "Could not open audio: %s\n", SDL_GetError());
+        return;
+    }
 
-   if (SDL_OpenAudio(desired, obtained) < 0) {
-      fprintf(stderr, "Could not open audio: %s\n", SDL_GetError());
-      return;
-   }
+    free(desired);
+    audio_spec = obtained;
 
-   free(desired);
-   audio_spec = obtained;
-
-   printf("AUDIO - S: %i\n",audio_spec->size);
-
-   //return audio_spec->size; // size is samples * channels * bytes per sample (1 or 2)
+    printf("AUDIO - S: %i\n",audio_spec->size);
 
 }
 
-
-
 void SoundClose (void)
 {
-
-   SDL_CloseAudio();
-   if (audio_spec) {
-      free(audio_spec);
-   }
+    SDL_CloseAudio();
+    if (audio_spec) 
+    {
+        free(audio_spec);
+    }
 
 }
 
 void ShowMenu (int nMenu) 
 { 
-/*
- while(1){
-  FillScreenPal((unsigned char *)pituka_arranque);  //show splash
-
-  if(linux_input()) {
-*/
-	emu_paused (0);
-/*
-        break;
-  }
- }
-*/
+    emu_paused (0);
 }
 
 void main_process_pause (int val) {}
@@ -457,7 +444,6 @@ void ShowEmuCommon (void) {}
 
 unsigned char Wiimote_CheckGun (void)
 {
-   return 0xff; //nada
+    return 0xff; //nada
 }
-
 
