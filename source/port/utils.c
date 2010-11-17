@@ -36,12 +36,12 @@ void process_spoolkey(int spool_ticks){
 
   if ( spoolkeys.comienzo == true ) {
     spoolkeys.cur = &spoolkeys.contenido[0];
-    spoolkeys.cont = strlen((char *) spoolkeys.contenido);
-    //le añadimos el intro
-    spoolkeys.cont++;
+    spoolkeys.cont = strlen((char *) spoolkeys.contenido) + 1; //contenido + intro final
+    tecla_pulsada = '\0';
+    tiempo_spool = 0;
+    pulsada = false;
     //no mas iniciaciones
     spoolkeys.comienzo = false;
-    tecla_pulsada = '\0';
   }
             
   if ( (tiempo_spool+spool_ticks)>50 ) { //si han pasado 50ms
