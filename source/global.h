@@ -14,7 +14,8 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
+#include <unistd.h>
+
 #ifndef PITUKA_H
 #define PITUKA_H
 
@@ -74,6 +75,7 @@ typedef struct{
 
 typedef struct{
   int nWiimotes;
+  int padsConnected;
   int Gunstick;
   int nRoms;
   int Dev_Keyb;
@@ -257,7 +259,7 @@ int loadBuffered_rom (void * rbuffer, int bSize);
   #define port_mktemp mkdtemp
 #endif
 
-#define MAX_CPCBUTTONS 20
+#define MAX_CPCBUTTONS 24
 
 /* MODOS */
 

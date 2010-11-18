@@ -112,6 +112,7 @@ int poll_input (void){
 
     poll_keyboard();
     poll_wiimote();
+    poll_pads();
 
     return 0;
 }
@@ -430,8 +431,9 @@ void Wiituka_InitCFG(void)
     WiiStatus.SaveXML = 0;
     WiiStatus.SaveKEY = 0;
 
-    WiiStatus.nWiimotes= 0;
-    WiiStatus.Gunstick= 0;
+    WiiStatus.nWiimotes = 0;
+    WiiStatus.padsConnected = 0;
+    WiiStatus.Gunstick = 0;
     WiiStatus.nRoms = -1;
     WiiStatus.UpdateDIR = 1;
     WiiStatus.UpdateXMLNET = 0;

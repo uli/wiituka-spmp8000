@@ -78,14 +78,28 @@ const unsigned char buttons_def[MAX_CPCBUTTONS * 2] = {
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
 };
 
-const unsigned int classic_binds[8][2] = { { WPAD_CLASSIC_BUTTON_A, WPAD_BUTTON_2} ,
-    { WPAD_CLASSIC_BUTTON_B, WPAD_BUTTON_1} ,  
-    { WPAD_CLASSIC_BUTTON_DOWN, WPAD_BUTTON_LEFT} , 
-    { WPAD_CLASSIC_BUTTON_UP, WPAD_BUTTON_RIGHT} , 
-    { WPAD_CLASSIC_BUTTON_RIGHT, WPAD_BUTTON_DOWN} , 
+const unsigned int classic_binds[8][2] = 
+{
+    { WPAD_CLASSIC_BUTTON_A, WPAD_BUTTON_2},
+    { WPAD_CLASSIC_BUTTON_B, WPAD_BUTTON_1},  
+    { WPAD_CLASSIC_BUTTON_DOWN, WPAD_BUTTON_LEFT}, 
+    { WPAD_CLASSIC_BUTTON_UP, WPAD_BUTTON_RIGHT}, 
+    { WPAD_CLASSIC_BUTTON_RIGHT, WPAD_BUTTON_DOWN}, 
     { WPAD_CLASSIC_BUTTON_LEFT, WPAD_BUTTON_UP},
     { WPAD_CLASSIC_BUTTON_PLUS, WPAD_BUTTON_PLUS},
     { WPAD_CLASSIC_BUTTON_MINUS, WPAD_BUTTON_MINUS},
+};
+
+const unsigned int gc_binds[8][2] = 
+{
+    { (PAD_BUTTON_B << 8), WPAD_BUTTON_2},
+    { (PAD_BUTTON_X << 8), WPAD_BUTTON_1},  
+    { (PAD_BUTTON_DOWN << 8), WPAD_BUTTON_LEFT}, 
+    { (PAD_BUTTON_UP << 8), WPAD_BUTTON_RIGHT}, 
+    { (PAD_BUTTON_RIGHT << 8), WPAD_BUTTON_DOWN}, 
+    { (PAD_BUTTON_LEFT << 8), WPAD_BUTTON_UP},
+    { (PAD_BUTTON_START << 8), WPAD_BUTTON_PLUS},
+    { (PAD_TRIGGER_Z << 8), WPAD_BUTTON_MINUS},
 };
 
 t_wiipads controls ={ 
@@ -105,7 +119,7 @@ t_wiipads controls ={
         { WPAD_BUTTON_A                                 , 0xff },
         { WPAD_BUTTON_B                                 , 0xff },
 
-        //classic
+        //classic support
         { WPAD_CLASSIC_BUTTON_X                         , 0xff },
         { WPAD_CLASSIC_BUTTON_Y                         , 0xff },
         { WPAD_CLASSIC_BUTTON_ZR                        , 0xff },
@@ -117,6 +131,13 @@ t_wiipads controls ={
         { WPAD_EXTRA_JOY_DOWN                           , 0xff },
         { WPAD_EXTRA_JOY_LEFT                           , 0xff },
         { WPAD_EXTRA_JOY_RIGHT                          , 0xff },
+
+        //gc support
+        {(PAD_BUTTON_A << 8)                            , 0xff },
+        {(PAD_BUTTON_Y << 8)                            , 0xff },
+        {(PAD_TRIGGER_L << 8)                           , 0xff },
+        {(PAD_TRIGGER_R << 8)                           , 0xff },
+
       }, 0, 0, 0, 0, NULL },
 
     { {
@@ -145,6 +166,12 @@ t_wiipads controls ={
         { WPAD_EXTRA_JOY_DOWN                           , 0xff },
         { WPAD_EXTRA_JOY_LEFT                           , 0xff },
         { WPAD_EXTRA_JOY_RIGHT                          , 0xff },
+
+        //gc support
+        {(PAD_BUTTON_A << 8)                            , 0xff },
+        {(PAD_BUTTON_Y << 8)                            , 0xff },
+        {(PAD_TRIGGER_L << 8)                           , 0xff },
+        {(PAD_TRIGGER_R << 8)                           , 0xff },
       }, 0, 0, 0, 0, NULL },
 };
 
@@ -232,6 +259,71 @@ inline void _wiimoteCheck (void)
     }
 }
 
+inline void _padGamecube (t_mote * wiipad, int channel)
+{
+    signed char pad_x = 0;
+    signed char pad_y = 0;
+    float t;
+
+    //PAD_SubStickX(channel) <> 70
+    //PAD_SubStickY(channel) <> 70
+    //PAD_TriggerL(channel) > 18
+    //PAD_TriggerR(channel) > 18
+
+    register int n;
+
+    for(n = 0; n < 8; n++)
+    {
+        if(wiipad->bHeld & gc_binds[n][0])
+        {
+            wiipad->bHeld |= gc_binds[n][1];
+        }
+    }
+
+    pad_x = PAD_StickX(channel);
+    pad_y = PAD_StickY(channel);
+
+	/***
+	Gamecube Joystick input from snes9x-gx
+	***/
+	// Is XY inside the "zone"?
+	if (pad_x * pad_x + pad_y * pad_y > JOY_ZONECAL * JOY_ZONECAL)
+	{
+		/*** we don't want division by zero ***/
+		if (pad_x > 0 && pad_y == 0)
+			wiipad->bHeld |= (PAD_BUTTON_RIGHT << 8);
+		if (pad_x < 0 && pad_y == 0)
+			wiipad->bHeld |= (PAD_BUTTON_LEFT << 8);
+		if (pad_x == 0 && pad_y > 0)
+			wiipad->bHeld |= (PAD_BUTTON_UP << 8);
+		if (pad_x == 0 && pad_y < 0)
+			wiipad->bHeld |= (PAD_BUTTON_DOWN << 8);
+
+		if (pad_x != 0 && pad_y != 0)
+		{
+			/*** Recalc left / right ***/
+			t = (float) pad_y / pad_x;
+			if (t >= -2.41421356237 && t < 2.41421356237)
+			{
+				if (pad_x >= 0)
+					wiipad->bHeld |= (PAD_BUTTON_RIGHT << 8);
+				else
+					wiipad->bHeld |= (PAD_BUTTON_LEFT << 8);
+			}
+
+			/*** Recalc up / down ***/
+			t = (float) pad_x / pad_y;
+			if (t >= -2.41421356237 && t < 2.41421356237)
+			{
+				if (pad_y >= 0)
+					wiipad->bHeld |= (PAD_BUTTON_UP << 8);
+				else
+					wiipad->bHeld |= (PAD_BUTTON_DOWN << 8);
+			}
+		}
+	}
+}
+
 /*! \fn inline void _wiimoteClassic (t_mote * wiipad)
     \brief Comprueba el estado del control classic y actualiza su bHeld.
 
@@ -251,7 +343,9 @@ inline void _wiimoteClassic (t_mote * wiipad)
     for(n = 0; n < 8; n++)
     {
         if(wiipad->bHeld & classic_binds[n][0])
-            wiipad->bHeld |=  classic_binds[n][1];
+        {
+            wiipad->bHeld |= classic_binds[n][1];
+        }
     }
 
     for(n = 0; n < 2; n++)
@@ -323,6 +417,32 @@ inline void _wiimoteClassic (t_mote * wiipad)
 
 }
 
+void poll_pads(void)
+{
+    switch(WiiStatus.padsConnected )
+    {
+        default:
+        case 2:
+            controls.wpad2.bDown = (PAD_ButtonsDown(PAD_CHAN1) << 8);
+            controls.wpad2.bHeld = (PAD_ButtonsHeld(PAD_CHAN1) << 8);
+            _padGamecube(&controls.wpad2, PAD_CHAN1);
+
+            if (controls.wpad2.bDown & (PAD_BUTTON_START << 8))
+                emu_paused (CPC.paused ^ 1);
+
+        case 1:
+            controls.wpad1.bDown = (PAD_ButtonsDown(PAD_CHAN0) << 8);
+            controls.wpad1.bHeld = (PAD_ButtonsHeld(PAD_CHAN0) << 8);
+            _padGamecube(&controls.wpad1, PAD_CHAN0);
+        
+            if (controls.wpad1.bDown & (PAD_BUTTON_START << 8))
+                emu_paused (CPC.paused ^ 1);
+
+        case 0: break;
+    }
+
+}
+
 
 /*! \fn void poll_wiimote(void)
     \brief Funcion global que actualiza el teclado del CPC con los controles de la Wii.
@@ -334,7 +454,7 @@ void poll_wiimote(void)
     static unsigned char bindto = 0xff;
 
     WPAD_ScanPads();
-
+    
     switch(WiiStatus.nWiimotes)
     {
         case 2:
@@ -472,10 +592,12 @@ int WiimoteSetup (int channel)
 */
 void WiimoteInit( void)
 {
+    PAD_Init(); //GC Pads
     WPAD_Init();
     WPAD_SetIdleTimeout(120); // Wiimote shutdown ...
 
     WPAD_ScanPads();
+    PAD_ScanPads();
 
     //configuramos por defecto un wiimote
     WPAD_SetVRes(WPAD_CHAN_0, rmode->fbWidth, rmode->xfbHeight);

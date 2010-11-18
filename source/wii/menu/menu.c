@@ -343,11 +343,14 @@ bool ButtonsCommon (int command, sMenuEntry * current)
             break;
     }
 
-    //in pause search second wiimote
+    //in pause search second wiimote and gc pads
     if(WiimoteSetup(WPAD_CHAN_1) == WPAD_ERR_NONE)
         WiiStatus.nWiimotes = 2;
     else
         WiiStatus.nWiimotes = 1;
+        
+    WiiStatus.padsConnected = PAD_ScanPads();
+
 
     if(current->buttons[0].btype == ButtonNode)
     {
@@ -745,6 +748,8 @@ void PlayBgMusic (void)
                 break;
 
             case 2:
+            case 3:
+/*
                 MP3Player_PlayBuffer(bckg_b_mp3, bckg_b_mp3_size, NULL);
                 strcpy(music_string, "Music by Cerror - A beginning");
                 break;
@@ -753,7 +758,7 @@ void PlayBgMusic (void)
                 MP3Player_PlayBuffer(bckg_c_mp3, bckg_c_mp3_size, NULL);
                 strcpy(music_string, "Music by Ultrasyd - Lost in Fractal Dimension");
                 break;
-
+*/
             case 4:
                 MP3Player_PlayBuffer(bckg_d_mp3, bckg_d_mp3_size, NULL);
                 strcpy(music_string, "Music by Fenyx Kell - Solarium");
