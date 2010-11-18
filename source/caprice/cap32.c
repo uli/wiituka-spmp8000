@@ -2363,7 +2363,8 @@ int emulator_patch_ROM (void)
 
    return 0;
 }
-
+
+
 void vdu_init (bool bolInit)
 {
    if (CPC.scr_fs_width > (CPC_VISIBLE_SCR_WIDTH * dwXScale)) {
@@ -2843,7 +2844,8 @@ void video_set_style (void)
                mode_handler[3] = draw16bpp_mode0_double;
                border_handler = draw16bpp_border_double;
                dwXScale = 2;
-               dwYScale = 4;               break;
+               dwYScale = 4;
+               break;
 
             case 3: // half size
                mode_handler[0] = draw16bpp_mode0_half;
@@ -3088,7 +3090,8 @@ int loadBuffered_rom (void * rbuffer, int bSize){
 
             if ((iErrorCode = zipBuffered_dir((byte *) rbuffer, bSize, &zip_info))) {
                 sprintf(debugstr, "ZIPDIR: No LEIDO %i", iErrorCode);
-            } else {                strncpy(extension, &zip_info.pchFileNames[(strlen(zip_info.pchFileNames) - 4)], 4); // grab the extension
+            } else {
+                strncpy(extension, &zip_info.pchFileNames[(strlen(zip_info.pchFileNames) - 4)], 4); // grab the extension
                 zip = true;
                 sprintf(debugstr, "ZIPDIR: LEIDO OK - %s", zip_info.pchFileNames);
             }
@@ -3201,7 +3204,8 @@ void cpc_main (void)
 {
 
   process_loadcfg();
-	  dword spool_ticks=0;	
+	
+  dword spool_ticks=0;	
 
   zip_info.pchFileNames = NULL;
   zip_info.pchExtension = ".dsk.sna.cdt.voc";
@@ -3249,10 +3253,12 @@ void cpc_main (void)
     spoolkeys.comienzo = true;
     spool = 1;
     reiniciado = 1;
-   #endif
+   #endif
+
    while (!emuDone) {
 		
-      if (!CPC.paused) { // run the emulation, as long as the user doesn't pause it
+      if (!CPC.paused) { // run the emulation, as long as the user doesn't pause it
+
              #if 1 //ndef GEKKO
              dwTicks = GetTicks();
              if (dwTicks >= dwTicksTargetFPS) { // update FPS counter?
