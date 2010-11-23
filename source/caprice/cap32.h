@@ -25,7 +25,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
+#include <unistd.h>
 
 #include "z80.h"
 #include "../global.h"
