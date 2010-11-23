@@ -10,6 +10,179 @@
 
 #include "../caprice/cap32.h"
 #include "../global.h"
+#include "utils.h"
+
+
+void FreeData (t_data * dat)
+{
+    free(dat->buffer);
+
+    dat->buffer = NULL;
+    dat->_bptr = 0;
+    dat->size = 0;
+}
+
+void ClearData (t_data * dat)
+{
+    if(dat->buffer != NULL)
+        free(dat->buffer);
+        
+    dat->buffer = NULL;
+    dat->_bptr = 0;
+    dat->size = 0;
+}
+
+bool InitData (t_data * dat, long alloc_size)
+{
+     dat->buffer = malloc (alloc_size);
+     memset(dat->buffer, 0, alloc_size);
+
+     if (dat->buffer == NULL)
+        return false;
+
+    dat->_bptr = 0;
+    dat->size = alloc_size;
+
+    return true;
+}
+
+
+int ReadData (t_data * dat, void * out, long data_size, bool move_ptr)
+{
+    if ( data_size  <= 0 )
+        return 0;
+
+    if ( dat->_bptr + data_size > dat->size ) //error don't read - out of limits!
+    {
+        memcpy(out, &dat->buffer[dat->_bptr], data_size);
+        if (move_ptr)
+            dat->_bptr += data_size;
+    }
+    else
+    {
+        data_size = (dat->_bptr + data_size) - dat->size; //get last info
+        memcpy(out, &dat->buffer[dat->_bptr], data_size);
+        if (move_ptr)
+            dat->_bptr = -1; //end of data
+    }
+
+    return data_size;
+}
+
+int WriteData (t_data * dat, void * source, long data_size, bool move_ptr)
+{
+    if ( data_size  <= 0 )
+        return 0;
+
+    if ( dat->_bptr + data_size <= dat->size ) //error don't read - out of limits!
+    {
+        memcpy(&dat->buffer[dat->_bptr], source, data_size);
+        if (move_ptr)
+            dat->_bptr += data_size;
+    }
+    else
+    {
+        data_size = (dat->_bptr + data_size) - dat->size; //get last info
+        memcpy(&dat->buffer[dat->_bptr], source, data_size);
+        if (move_ptr)
+            dat->_bptr = -1; //end of data
+    }
+
+    return data_size;
+}
+
+bool SeekData (t_data * dat, long pos, bool from_ptr)
+{
+    if ( pos >=  dat->size )
+        return false;
+
+    if ( from_ptr )
+    {
+        if ( dat->_bptr + pos <= dat->size ) //error don't read - out of limits!
+            return false;
+
+        dat->_bptr += pos;
+    }
+    else
+    {
+        dat->_bptr = pos;
+    }
+
+    return true;
+}
+
+unsigned short GetwordData (t_data * dat, long pos)
+{
+
+    if ((pos < 0) && (dat != NULL))
+        return 0;
+    
+    if (pos > dat->size - 2)
+        return 0;
+
+    const unsigned short val = (dat->buffer[pos] << 8) + dat->buffer[pos+1];
+
+    return (val);
+}
+/*
+	const UInt16	val = (data_arr [pos] << 8) + data_arr [pos + 1];
+
+	return (val);
+*/
+
+long GetptrData (t_data * dat, long pos)
+{
+    if ((pos < 0) && (dat != NULL))
+        return 0;
+    
+    if (pos > dat->size - 2)
+        return 0;
+
+    signed short val = (signed short) GetwordData( dat, pos );
+    val += pos;
+    
+    return (val);
+}
+/*
+	Int16				val = static_cast <Int16> (read_word (data_arr, pos));
+	val += pos;
+
+	return (val);
+*/
+
+char * GetstrData (t_data * dat, long pos)
+{
+    if ((pos < 0) && (dat != NULL))
+        return 0;
+    
+    if (pos > dat->size - 1)
+        return 0;
+
+    int tmp_pos = 0;
+	char * str;
+	const long file_len = dat->size;
+	
+	while ((pos + tmp_pos) < file_len && dat->buffer[(pos + tmp_pos)] != '\0')
+	    tmp_pos++;
+
+    str = malloc (tmp_pos+1);
+    if(str == NULL)
+        return 0;
+
+    strncpy(str, ((char *) &dat->buffer[pos]), tmp_pos);
+
+    str[(tmp_pos+1)] = '\0';
+
+	return (str);
+
+}
+
+/*
+
+ OLD PITUKA UTILS
+
+*/
+
 
 extern byte keyboard_matrix[16];
 extern byte keyboard_translation_SDL[320];
