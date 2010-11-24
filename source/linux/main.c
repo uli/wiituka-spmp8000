@@ -73,7 +73,7 @@ bool sonido_ant;
 /* CPC */
 extern Bitu8 keyboard_matrix[16];
 extern Bitu8 bit_values[8];
-extern Bitu8 keyboard_translation[320];
+extern Bitu8 keyboard_translation_SDL[320];
 
 extern Bitu8 * pbGPBuffer;
 
@@ -189,7 +189,7 @@ Bitu8 event2key (SDL_Event event)
     if (event.key.keysym.sym>=320) {
         return 0xff;
     } else {
-        return keyboard_translation[event.key.keysym.sym];
+        return keyboard_translation_SDL[event.key.keysym.sym];
     }
 }
 

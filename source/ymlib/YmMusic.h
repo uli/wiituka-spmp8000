@@ -42,7 +42,7 @@
 
 #define	YMTPREC		16
 #define	MAX_VOICE	8
-#define	PC_DAC_FREQ	44100
+#define	PC_DAC_FREQ	48000
 #define	YMTNBSRATE	(PC_DAC_FREQ/50)
 
 typedef enum
@@ -124,7 +124,7 @@ class	CYmMusic
 {
 
 public:
-	CYmMusic(ymint _replayRate=44100);
+	CYmMusic(ymint _replayRate=48000);
 	~CYmMusic();
 
 	ymbool	load(const char *pName);

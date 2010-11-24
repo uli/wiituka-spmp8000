@@ -72,6 +72,7 @@ ymint				volAr,volBr,volCr,volEr;
 ymint				*pVolAl,*pVolBl,*pVolCl;
 ymint				*pVolAr,*pVolBr,*pVolCr;
 
+#define MONO_OUT
 
 //----------------------------------------------------------------------
 // Very cool and fast DC Adjuster ! This is the *new* stuff of that
@@ -189,6 +190,13 @@ ymint i,env;
 		pVolA = &volA;
 		pVolB = &volB;
 		pVolC = &volC;
+		
+		pVolAl = &volAl;
+		pVolAr = &volAr;
+		pVolBl = &volBl;
+		pVolBr = &volBr;
+		pVolCl = &volCl;
+		pVolCr = &volCr;
 
 	// Reset YM2149
 		reset();
