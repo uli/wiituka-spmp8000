@@ -1,6 +1,10 @@
 # use "make -f makefile.unix RELEASE=TRUE" to create release executable
 
 CC	= gcc
+AR  = ar 
+LINKER = gpp
+
+ARFLAGS = rcs
 
 GFLAGS	= -Wall `sdl-config --cflags` -DLINUX
 
@@ -10,10 +14,12 @@ else
 CFLAGS	= $(GFLAGS) -ggdb
 endif
 
-LIBS = `sdl-config --libs` -lz
+LIBS = `sdl-config --libs` -lz -lstdc++
 
-pituka: caprice/cap32.c caprice/crtc.o caprice/fdc.o caprice/psg.o caprice/tape.o caprice/z80.o linux/main.o port/utils.o port/dskutils.o port/unzip.o caprice/cap32.h caprice/z80.h
-	$(CC) $(CFLAGS) $(IPATHS) -o pituka caprice/cap32.c linux/main.o port/utils.o port/dskutils.o port/unzip.o caprice/crtc.o caprice/fdc.o caprice/psg.o caprice/tape.o caprice/z80.o $(LIBS)
+CXXFLAGS= -Iymlib -ggdb
+
+pituka: caprice/cap32.c caprice/crtc.o caprice/fdc.o caprice/psg.o caprice/tape.o caprice/z80.o linux/main.o port/utils.o port/dskutils.o port/unzip.o port/ymplayer.o ymlib/ymlib.a caprice/cap32.h caprice/z80.h
+	gcc $(CFLAGS) $(IPATHS) -o pituka caprice/cap32.c linux/main.o port/utils.o port/dskutils.o port/unzip.o caprice/crtc.o caprice/fdc.o caprice/psg.o caprice/tape.o caprice/z80.o port/ymplayer.o ymlib/ymlib.a $(LIBS)
 
 main.o: linux/main.c caprice/cap32.h caprice/crtc.h caprice/z80.h
 	$(CC) $(CFLAGS) -c linux/main.c
@@ -42,5 +48,9 @@ dskutils.o: port/dskutils.c  port/dskutils.h caprice/cap32.h
 unzip.o: port/unzip.c  port/unzip.h caprice/cap32.h
 	$(CC) $(CFLAGS) -c port/unzip.c
 
+ymlib/ymlib.a: ymlib/YmMusic.o ymlib/Ymload.o ymlib/Ym2149Ex.o ymlib/digidrum.o ymlib/YmUserInterface.o ymlib/LZH/LzhLib.o
+	$(AR) $(ARFLAGS) ymlib/ymlib.a ymlib/YmMusic.o ymlib/Ymload.o ymlib/Ym2149Ex.o ymlib/digidrum.o ymlib/YmUserInterface.o ymlib/LZH/LzhLib.o
+
 clean:
-	rm caprice/*.o linux/*.o port/*.o caprice/*~ linux/*~ port/*.o~ pituka 
+	rm caprice/*.o linux/*.o port/*.o caprice/*~ linux/*~ port/*.o ymlib/*.o ymlib/LZH/*.o ymlib/ymlib.a pituka
+

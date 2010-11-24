@@ -2700,6 +2700,7 @@ int audio_init (void)
    memset(pbSndBuffer, 0, CPC.snd_buffersize*6);
    CPC.snd_bufferptr = pbSndBuffer + (CPC.snd_buffersize*3); // init write cursor
 
+
    dwSndMinSafeDist = CPC.snd_buffersize*2; // the closest together the cursors may be
    dwSndMaxSafeDist = CPC.snd_buffersize*4; // the farthest apart the cursors may be
 
@@ -2708,7 +2709,6 @@ int audio_init (void)
    for (n = 0; n < 16; n++) {
       SetAYRegister(n, PSG.RegisterAY.Index[n]); // init sound emulation with valid values
    }
-
 
    return 1;
 }
@@ -3099,7 +3099,7 @@ int loadBuffered_rom (void * rbuffer, int bSize){
             if(zip && (zip_info.unZipSize > 0)){
 
                   byte * ebuffer = NULL; 
-		  ebuffer = malloc (zip_info.unZipSize); //Using Zip Info for extract
+		  ebuffer = (byte *) malloc (zip_info.unZipSize); //Using Zip Info for extract
 
 		  if(ebuffer == NULL)
 			return 0;
@@ -3208,7 +3208,7 @@ void cpc_main (void)
   dword spool_ticks=0;	
 
   zip_info.pchFileNames = NULL;
-  zip_info.pchExtension = ".dsk.sna.cdt.voc";
+  zip_info.pchExtension = (char*) ".dsk.sna.cdt.voc";
 
    dword dwSndDist = 0;
    

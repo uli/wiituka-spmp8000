@@ -16,6 +16,7 @@ typedef unsigned int bool;
 
 #include "../global.h"
 #include "../port/gfx/pituka-arranque.h"
+#include "../ymlib/StSoundLibrary.h"
 
 #define DEFAULT_FIFO_SIZE	(256*1024)
 
@@ -75,6 +76,11 @@ extern Bitu8 bit_values[8];
 extern Bitu8 keyboard_translation[320];
 
 extern Bitu8 * pbGPBuffer;
+
+/* ym player */
+extern int ym_playing;
+extern volatile	YMMUSIC			*	s_pMusic;
+int ymload( char* filename );
 
 static int init_linux (void)
 {
@@ -268,10 +274,12 @@ int main(int argc, char *argv[]) {
                 strncpy(rom_name, &argv[i][0], sizeof(rom_name)-1); // take it as is
 
             printf("ROM: %s\n", rom_name);
-            WiiStatus.LoadDISK = 2;
+            //WiiStatus.LoadDISK = 2;
         }
     }
-
+    
+    ymload(rom_name);
+    
     cpc_main();
 
     close_buffer();
@@ -367,11 +375,20 @@ void close_buffer (void)
 
 void SoundUpdate (void *userdata, Bitu8 *stream, int len)
 {
-    memcpy(stream, pbSndStream, len);
-    pbSndStream += len;
 
-    if (pbSndStream >= pbSndBufferEnd) 
-        pbSndStream = pbSndBuffer;
+    if(ym_playing)
+    {
+		int nbSample = len / sizeof(ymsample);
+		ymMusicCompute((void*)s_pMusic,(ymsample*)stream,nbSample);
+    }
+    else
+    {
+        memcpy(stream, pbSndStream, len);
+        pbSndStream += len;
+
+        if (pbSndStream >= pbSndBufferEnd) 
+            pbSndStream = pbSndBuffer;
+    }
 }
 
 int audio_align_samples (int given)
@@ -442,7 +459,7 @@ void main_process_pause (int val) {}
 void ShowLed(int val) {}
 void ShowEmuCommon (void) {}
 
-unsigned char Wiimote_CheckGun (void)
+inline unsigned char Wiimote_CheckGun (void)
 {
     return 0xff; //nada
 }
