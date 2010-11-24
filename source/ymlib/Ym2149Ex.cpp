@@ -156,13 +156,6 @@ ymint i,env;
 				Level_CR[i * 2 + 1] = (int)rint(Index_CR / 255.0 * ((ymVolumeTable[i]*2)/6));
 				ymVolumeTable[i] = (ymVolumeTable[i]*2)/6;
 
-				//printf("vol:%i \n", ymVolumeTable[i]);
-				//printf(" al:%i (%u / 255) * %i) ar:%i (%u / 255) * %i) \n", Level_AL[i], Index_AL, ((ymVolumeTable[i]*2)/6) 
-                //                                  				          , Level_AR[i], Index_AR, ((ymVolumeTable[i]*2)/6) );
-				//printf(" bl:%i (%u / 255) * %i) br:%i (%u / 255) * %i) \n", Level_BL[i], Index_BL, ((ymVolumeTable[i]*2)/6) 
-                //                                  				          , Level_BR[i], Index_BR, ((ymVolumeTable[i]*2)/6) );
-				//printf(" cl:%i (%u / 255) * %i) cr:%i (%u / 255) * %i) \n", Level_CL[i], Index_CL, ((ymVolumeTable[i]*2)/6) 
-                //                                  				          , Level_CR[i], Index_CR, ((ymVolumeTable[i]*2)/6) );
 			}
 		}
 
@@ -314,6 +307,10 @@ void	CYm2149Ex::reset(void)
 
 	m_lowPassFilter[0] = 0;
 	m_lowPassFilter[1] = 0;
+	m_lowPassFilterl[0] = 0;
+	m_lowPassFilterl[1] = 0;
+	m_lowPassFilterr[0] = 0;
+	m_lowPassFilterr[1] = 0;
 
 }
 
@@ -365,12 +362,29 @@ void	CYm2149Ex::sidVolumeCompute(ymint voice,ymint *pVol)
 		}
 }
 
-int CYm2149Ex::LowPassFilter(int in)
+int CYm2149Ex::LowPassFilter(int in, int channel)
 {
-	const int out = (m_lowPassFilter[0]>>2) + (m_lowPassFilter[1]>>1) + (in>>2);
-	m_lowPassFilter[0] = m_lowPassFilter[1];
-	m_lowPassFilter[1] = in;
-	return out;
+
+	if(channel == 1) // left
+	{
+	    const int out = (m_lowPassFilterl[0]>>2) + (m_lowPassFilterl[1]>>1) + (in>>2);
+
+    	m_lowPassFilterl[0] = m_lowPassFilterl[1];
+	    m_lowPassFilterl[1] = in;
+
+    	return out;
+	}
+	else //right
+	{
+	    const int out = (m_lowPassFilterr[0]>>2) + (m_lowPassFilterr[1]>>1) + (in>>2);
+
+    	m_lowPassFilterr[0] = m_lowPassFilterr[1];
+	    m_lowPassFilterr[1] = in;
+
+    	return out;
+	}
+
+
 }
 
 ymsample CYm2149Ex::nextSample(void)
@@ -395,23 +409,20 @@ ymint bt,bn;
 		sidVolumeCompute(2,&volC);
 
 	//---------------------------------------------------
-	// Tone+noise+env+DAC for three voices !
+	// Tone+noise+env+DAC for three voices - AND CHANNELS TOO :P!
 	//---------------------------------------------------
 		bt = ((((yms32)posA)>>31) | mixerTA) & (bn | mixerNA);
-		//vol  = (*pVolA)&bt;
 		voll = (*pVolAl)&bt;
 		volr = (*pVolAr)&bt;
-		//printf("A - bt:%i vol(%i)[%i] l(%i)[%i]\n", bt, vol, *pVolA, voll, *pVolAl);
+
 		bt = ((((yms32)posB)>>31) | mixerTB) & (bn | mixerNB);
-		//vol += (*pVolB)&bt;
 		voll += (*pVolBl)&bt;
 		volr += (*pVolBr)&bt;
-		//printf("B - bt:%i vol(%i)[%i] l(%i)[%i]\n", bt, vol, *pVolB, voll, *pVolBl);
+
 		bt = ((((yms32)posC)>>31) | mixerTC) & (bn | mixerNC);
-		//vol += (*pVolC)&bt;
 		voll += (*pVolCl)&bt;
 		volr += (*pVolCr)&bt;
-		//printf("C - bt:%i vol(%i)[%i] l(%i)[%i]\n", bt, vol, *pVolC, voll, *pVolCl);
+
 
 	//---------------------------------------------------
 	// Inc
@@ -448,14 +459,14 @@ ymint bt,bn;
 		m_dcAdjust.AddSample(voll);
 		short inl = voll - m_dcAdjust.GetDcLevel();
 		short inr = volr - m_dcAdjust.GetDcLevel();
-		//short in  =  vol - m_dcAdjust.GetDcLevel();
+		
 		if(m_bFilter)
 		{
-		    inl = LowPassFilter(inl);
-		    inr = LowPassFilter(inr);
-		    //in  = LowPassFilter(in);
+		    inl = LowPassFilter(inl, 1);
+		    inr = LowPassFilter(inr, 2);
         }
-		ymsample val = ((inl << 16) + inr);
+        
+		ymsample val = ((inr << 16) + inl);
 		return val;
 }
 

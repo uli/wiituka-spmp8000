@@ -122,7 +122,7 @@ private:
 		ymu32	rndCompute(void);
 
 		void	sidVolumeCompute(ymint voice,ymint *pVol);
-		inline int		LowPassFilter(int in);
+		inline int		LowPassFilter(int in, int channel);
 
 		ymint	replayFrequency;
 		ymu32	internalClock;
@@ -156,6 +156,8 @@ private:
 		ymint	syncBuzzerShape;
 
 		int		m_lowPassFilter[2];
+		int		m_lowPassFilterl[2];
+		int		m_lowPassFilterr[2];
 		ymbool	m_bFilter;
 };
 
