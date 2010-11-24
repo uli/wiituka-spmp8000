@@ -17,6 +17,7 @@ typedef unsigned int bool;
 #include "../global.h"
 #include "../port/gfx/pituka-arranque.h"
 #include "../ymlib/StSoundLibrary.h"
+#include "../port/ymplayer.h"
 
 #define DEFAULT_FIFO_SIZE	(256*1024)
 
@@ -76,11 +77,6 @@ extern Bitu8 bit_values[8];
 extern Bitu8 keyboard_translation_SDL[320];
 
 extern Bitu8 * pbGPBuffer;
-
-/* ym player */
-extern int ym_playing;
-extern volatile	YMMUSIC			*	s_pMusic;
-int ymload( char* filename );
 
 static int init_linux (void)
 {
@@ -221,11 +217,29 @@ int poll_input (void)
 
         switch (event.type) {
             case SDL_MOUSEBUTTONUP:
+                if(event.button.button == SDL_BUTTON_LEFT)
+                {
+                    if(ym_playing == 1)
+                    {
+                        ymclose();
+                        emu_paused (0);
+                    }
+                    else
+                    {
+                        emu_paused (1);
+                        ymload(rom_name);
+                    }
+                }
+                else
+                {
+                
                 WiiStatus.LoadDISK = 2;
                 strcpy(rom_name, "../../shinobi.zip");
                 printf("ROM: %s\n", rom_name);
                 emu_paused (1);
                 emulator_reset(true);
+                
+                }
                 break;
 
             case SDL_KEYDOWN:
@@ -278,11 +292,12 @@ int main(int argc, char *argv[]) {
         }
     }
     
-    ymload(rom_name);
-    
     cpc_main();
 
     close_buffer();
+
+    if(ym_playing == 1)
+       ymclose();
 
     SDL_Quit();
 
