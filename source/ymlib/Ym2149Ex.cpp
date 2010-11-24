@@ -155,13 +155,13 @@ ymint i,env;
 				Level_CR[i * 2 + 1] = (int)rint(Index_CR / 255.0 * ((ymVolumeTable[i]*2)/6));
 				ymVolumeTable[i] = (ymVolumeTable[i]*2)/6;
 
-				printf("vol:%i \n", ymVolumeTable[i]);
-				printf(" al:%i (%u / 255) * %i) ar:%i (%u / 255) * %i) \n", Level_AL[i], Index_AL, ((ymVolumeTable[i]*2)/6) 
-                                                  				          , Level_AR[i], Index_AR, ((ymVolumeTable[i]*2)/6) );
-				printf(" bl:%i (%u / 255) * %i) br:%i (%u / 255) * %i) \n", Level_BL[i], Index_BL, ((ymVolumeTable[i]*2)/6) 
-                                                  				          , Level_BR[i], Index_BR, ((ymVolumeTable[i]*2)/6) );
-				printf(" cl:%i (%u / 255) * %i) cr:%i (%u / 255) * %i) \n", Level_CL[i], Index_CL, ((ymVolumeTable[i]*2)/6) 
-                                                  				          , Level_CR[i], Index_CR, ((ymVolumeTable[i]*2)/6) );
+				//printf("vol:%i \n", ymVolumeTable[i]);
+				//printf(" al:%i (%u / 255) * %i) ar:%i (%u / 255) * %i) \n", Level_AL[i], Index_AL, ((ymVolumeTable[i]*2)/6) 
+                //                                  				          , Level_AR[i], Index_AR, ((ymVolumeTable[i]*2)/6) );
+				//printf(" bl:%i (%u / 255) * %i) br:%i (%u / 255) * %i) \n", Level_BL[i], Index_BL, ((ymVolumeTable[i]*2)/6) 
+                //                                  				          , Level_BR[i], Index_BR, ((ymVolumeTable[i]*2)/6) );
+				//printf(" cl:%i (%u / 255) * %i) cr:%i (%u / 255) * %i) \n", Level_CL[i], Index_CL, ((ymVolumeTable[i]*2)/6) 
+                //                                  				          , Level_CR[i], Index_CR, ((ymVolumeTable[i]*2)/6) );
 			}
 		}
 
@@ -390,17 +390,17 @@ ymint bt,bn;
 	// Tone+noise+env+DAC for three voices !
 	//---------------------------------------------------
 		bt = ((((yms32)posA)>>31) | mixerTA) & (bn | mixerNA);
-		vol  = (*pVolA)&bt;
+		//vol  = (*pVolA)&bt;
 		voll = (*pVolAl)&bt;
 		volr = (*pVolAr)&bt;
 		//printf("A - bt:%i vol(%i)[%i] l(%i)[%i]\n", bt, vol, *pVolA, voll, *pVolAl);
 		bt = ((((yms32)posB)>>31) | mixerTB) & (bn | mixerNB);
-		vol += (*pVolB)&bt;
+		//vol += (*pVolB)&bt;
 		voll += (*pVolBl)&bt;
 		volr += (*pVolBr)&bt;
 		//printf("B - bt:%i vol(%i)[%i] l(%i)[%i]\n", bt, vol, *pVolB, voll, *pVolBl);
 		bt = ((((yms32)posC)>>31) | mixerTC) & (bn | mixerNC);
-		vol += (*pVolC)&bt;
+		//vol += (*pVolC)&bt;
 		voll += (*pVolCl)&bt;
 		volr += (*pVolCr)&bt;
 		//printf("C - bt:%i vol(%i)[%i] l(%i)[%i]\n", bt, vol, *pVolC, voll, *pVolCl);
@@ -440,17 +440,14 @@ ymint bt,bn;
 		m_dcAdjust.AddSample(voll);
 		short inl = voll - m_dcAdjust.GetDcLevel();
 		short inr = volr - m_dcAdjust.GetDcLevel();
+		//short in  =  vol - m_dcAdjust.GetDcLevel();
 		if(m_bFilter)
 		{
 		    inl = LowPassFilter(inl);
 		    inr = LowPassFilter(inr);
+		    //in  = LowPassFilter(in);
         }
-		ymsample val = //(vol << 16) + vol; 
-		((inl << 16) + inr);
-		//printf("vol:%i l:%i r:%i\n", vol, volr, voll);
-		//m_dcAdjust.AddSample(vol);
-		//const int in = vol - m_dcAdjust.GetDcLevel();
-		//return (m_bFilter) ? LowPassFilter(in) : in;
+		ymsample val = ((inl << 16) + inr);
 		return val;
 }
 
@@ -527,11 +524,13 @@ void	CYm2149Ex::writeRegister(ymint reg,ymint data)
 			volA = ymVolumeTable[data&15];
 			volAl = Level_AL[(data&31) * 2 + 1];
 			volAr = Level_AR[(data&31) * 2 + 1];
+			volEl = Level_AR[(envData[envShape][envPhase][envPos>>(32-5)])];
+			volEr = Level_AL[(envData[envShape][envPhase][envPos>>(32-5)])];
 			if (data&0x10)
 			{
 				pVolA = &volE;
-				pVolAl = &volE;
-				pVolAr = &volE;
+				pVolAl = &volEl;
+				pVolAr = &volEr;
 			}
 			else
 			{
@@ -546,11 +545,13 @@ void	CYm2149Ex::writeRegister(ymint reg,ymint data)
 			volB = ymVolumeTable[data&15];
 			volBl = Level_BL[(data&31) * 2 + 1];
 			volBr = Level_BR[(data&31) * 2 + 1];
+			volEl = Level_BR[(envData[envShape][envPhase][envPos>>(32-5)])];
+			volEr = Level_BL[(envData[envShape][envPhase][envPos>>(32-5)])];
 			if (data&0x10)
 			{
 				pVolB = &volE;
-				pVolBl = &volE;
-				pVolBr = &volE;
+				pVolBl = &volEl;
+				pVolBr = &volEr;
 			}
 			else
 			{
@@ -565,11 +566,13 @@ void	CYm2149Ex::writeRegister(ymint reg,ymint data)
 			volC = ymVolumeTable[data&15];
 			volCl = Level_CL[(data&31) * 2 + 1];
 			volCr = Level_CR[(data&31) * 2 + 1];
+			volEl = Level_CR[(envData[envShape][envPhase][envPos>>(32-5)])];
+			volEr = Level_CL[(envData[envShape][envPhase][envPos>>(32-5)])];
 			if (data&0x10)
 			{
 				pVolC = &volE;
-				pVolCl = &volE;
-				pVolCr = &volE;
+				pVolCl = &volEl;
+				pVolCr = &volEr;
 			}
 			else
 			{
