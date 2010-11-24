@@ -202,7 +202,7 @@ private:
 // ATARI Digi Mix Music.
 //-------------------------------------------------------------
 	void	readNextBlockInfo(void);
-	void	stDigitMix(signed short *pWrite16,int nbs);
+	void	stDigitMix(int *pWrite16,int nbs);
 	void	computeTimeInfo(void);
 	void	setMixTime(ymu32 time);
 
@@ -232,15 +232,15 @@ private:
 // YM-Universal-Tracker
 //-------------------------------------------------------------
 	void	ymTrackerInit(int volMaxPercent);
-	void	ymTrackerUpdate(signed short *pBuffer,int nbSample);
+	void	ymTrackerUpdate(int *pBuffer,int nbSample);
 	void	ymTrackerDesInterleave(void);
 	void	ymTrackerPlayer(ymTrackerVoice_t *pVoice);
-	void	ymTrackerVoiceAdd(ymTrackerVoice_t *pVoice,signed short *pBuffer,int nbs);
+	void	ymTrackerVoiceAdd(ymTrackerVoice_t *pVoice,int *pBuffer,int nbs);
 
 	int			nbVoice;
 	ymTrackerVoice_t	ymTrackerVoice[MAX_VOICE];
 	int					ymTrackerNbSampleBefore;
-	signed short		ymTrackerVolumeTable[256*64];
+	int		ymTrackerVolumeTable[256*64];
 	int					ymTrackerFreqShift;
 
 

@@ -63,11 +63,15 @@ extern yms16 Amplitudes_AY[16];
 //   0, 836, 1212, 1773, 2619, 3875, 5397, 8823,
 //   10392, 16706, 23339, 29292, 36969, 46421, 55195, 65535
 //};
-ymint Level_AR[32], Level_AL[32], Level_BR[32], Level_BL[32], Level_CR[32], Level_CL[32], PreAmpMax;
-ymchar Index_AL, Index_AR, Index_BL, Index_BR, Index_CL, Index_CR;
+ymint Level_AR[32], Level_AL[32], Level_BR[32], Level_BL[32], Level_CR[32], Level_CL[32];
+ymu8 Index_AL, Index_AR, Index_BL, Index_BR, Index_CL, Index_CR;
 
 ymint				volAl,volBl,volCl,volEl;
 ymint				volAr,volBr,volCr,volEr;
+
+ymint				*pVolAl,*pVolBl,*pVolCl;
+ymint				*pVolAr,*pVolBr,*pVolCr;
+
 
 //----------------------------------------------------------------------
 // Very cool and fast DC Adjuster ! This is the *new* stuff of that
@@ -129,58 +133,6 @@ ymint i,env;
    Index_BR = 170;
    Index_CL = 13;
    Index_CR = 255;
-   PreAmpMax = 100;
-
-   Index_A = Index_AL;
-   Index_B = Index_BL;
-   Index_C = Index_CL;
-   l = Index_A + Index_B + Index_C;
-   r = Index_AR + Index_BR + Index_CR;
-   if (l < r) {
-      l = r;
-   }
-   if (l == 0) {
-      l++;
-   }
-   r = 32767;
-   l = 255 * r / l;
-   for (i = 0; i < 16; i++) {
-      b = (int)rint(Index_A / 255.0 * Amplitudes_AY[i]);
-      b = (int)rint(b / 65535.0 * l);
-      Level_AL[i * 2] = b;
-      Level_AL[i * 2 + 1] = b;
-      b = (int)rint(Index_AR / 255.0 * Amplitudes_AY[i]);
-      b = (int)rint(b / 65535.0 * l);
-      Level_AR[i * 2] = b;
-      Level_AR[i * 2 + 1] = b;
-      b = (int)rint(Index_B / 255.0 * Amplitudes_AY[i]);
-      b = (int)rint(b / 65535.0 * l);
-      Level_BL[i * 2] = b;
-      Level_BL[i * 2 + 1] = b;
-      b = (int)rint(Index_BR / 255.0 * Amplitudes_AY[i]);
-      b = (int)rint(b / 65535.0 * l);
-      Level_BR[i * 2] = b;
-      Level_BR[i * 2 + 1] = b;
-      b = (int)rint(Index_C / 255.0 * Amplitudes_AY[i]);
-      b = (int)rint(b / 65535.0 * l);
-      Level_CL[i * 2] = b;
-      Level_CL[i * 2 + 1] = b;
-      b = (int)rint(Index_CR / 255.0 * Amplitudes_AY[i]);
-      b = (int)rint(b / 65535.0 * l);
-      Level_CR[i * 2] = b;
-      Level_CR[i * 2 + 1] = b;
-   }
-   k = exp(90 * log(2) / PreAmpMax) - 1;
-   for (i = 0; i < 32; i++) {
-      Level_AL[i] = (int)rint(Level_AL[i] * k);
-      Level_AR[i] = (int)rint(Level_AR[i] * k);
-      Level_BL[i] = (int)rint(Level_BL[i] * k);
-      Level_BR[i] = (int)rint(Level_BR[i] * k);
-      Level_CL[i] = (int)rint(Level_CL[i] * k);
-      Level_CR[i] = (int)rint(Level_CR[i] * k);
-   }
-
-   /* END STEREO VOLS */ 
 
 		m_bFilter = true;
 
@@ -189,7 +141,27 @@ ymint i,env;
 		{
 			for (i=0;i<16;i++)
 			{
+				Level_AL[i * 2] = (int)rint(Index_AL / 255.0 * ((ymVolumeTable[i]*2)/6));
+				Level_AL[i * 2 + 1] = (int)rint(Index_AL / 255.0 * ((ymVolumeTable[i]*2)/6));
+				Level_AR[i * 2] = (int)rint(Index_AR / 255.0 * ((ymVolumeTable[i]*2)/6));
+				Level_AR[i * 2 + 1] = (int)rint(Index_AR / 255.0 * ((ymVolumeTable[i]*2)/6));
+				Level_BL[i * 2] = (int)rint(Index_BL / 255.0 * ((ymVolumeTable[i]*2)/6));
+				Level_BL[i * 2 + 1] = (int)rint(Index_BL / 255.0 * ((ymVolumeTable[i]*2)/6));
+				Level_BR[i * 2] = (int)rint(Index_BR / 255.0 * ((ymVolumeTable[i]*2)/6));
+				Level_BR[i * 2 + 1] = (int)rint(Index_BR / 255.0 * ((ymVolumeTable[i]*2)/6));
+				Level_CL[i * 2] = (int)rint(Index_CL / 255.0 * ((ymVolumeTable[i]*2)/6));
+				Level_CL[i * 2 + 1] = (int)rint(Index_CL / 255.0 * ((ymVolumeTable[i]*2)/6));
+				Level_CR[i * 2] = (int)rint(Index_CR / 255.0 * ((ymVolumeTable[i]*2)/6));
+				Level_CR[i * 2 + 1] = (int)rint(Index_CR / 255.0 * ((ymVolumeTable[i]*2)/6));
 				ymVolumeTable[i] = (ymVolumeTable[i]*2)/6;
+
+				printf("vol:%i \n", ymVolumeTable[i]);
+				printf(" al:%i (%u / 255) * %i) ar:%i (%u / 255) * %i) \n", Level_AL[i], Index_AL, ((ymVolumeTable[i]*2)/6) 
+                                                  				          , Level_AR[i], Index_AR, ((ymVolumeTable[i]*2)/6) );
+				printf(" bl:%i (%u / 255) * %i) br:%i (%u / 255) * %i) \n", Level_BL[i], Index_BL, ((ymVolumeTable[i]*2)/6) 
+                                                  				          , Level_BR[i], Index_BR, ((ymVolumeTable[i]*2)/6) );
+				printf(" cl:%i (%u / 255) * %i) cr:%i (%u / 255) * %i) \n", Level_CL[i], Index_CL, ((ymVolumeTable[i]*2)/6) 
+                                                  				          , Level_CR[i], Index_CR, ((ymVolumeTable[i]*2)/6) );
 			}
 		}
 
@@ -396,7 +368,10 @@ int CYm2149Ex::LowPassFilter(int in)
 ymsample CYm2149Ex::nextSample(void)
 {
 ymint vol;
+ymint voll, volr;
 ymint bt,bn;
+
+        static int channel = 0;
 
 		if (noisePos&0xffff0000)
 		{
@@ -416,10 +391,19 @@ ymint bt,bn;
 	//---------------------------------------------------
 		bt = ((((yms32)posA)>>31) | mixerTA) & (bn | mixerNA);
 		vol  = (*pVolA)&bt;
+		voll = (*pVolAl)&bt;
+		volr = (*pVolAr)&bt;
+		//printf("A - bt:%i vol(%i)[%i] l(%i)[%i]\n", bt, vol, *pVolA, voll, *pVolAl);
 		bt = ((((yms32)posB)>>31) | mixerTB) & (bn | mixerNB);
 		vol += (*pVolB)&bt;
+		voll += (*pVolBl)&bt;
+		volr += (*pVolBr)&bt;
+		//printf("B - bt:%i vol(%i)[%i] l(%i)[%i]\n", bt, vol, *pVolB, voll, *pVolBl);
 		bt = ((((yms32)posC)>>31) | mixerTC) & (bn | mixerNC);
 		vol += (*pVolC)&bt;
+		voll += (*pVolCl)&bt;
+		volr += (*pVolCr)&bt;
+		//printf("C - bt:%i vol(%i)[%i] l(%i)[%i]\n", bt, vol, *pVolC, voll, *pVolCl);
 
 	//---------------------------------------------------
 	// Inc
@@ -452,9 +436,22 @@ ymint bt,bn;
 	//---------------------------------------------------
 	// Normalize process
 	//---------------------------------------------------
-		m_dcAdjust.AddSample(vol);
-		const int in = vol - m_dcAdjust.GetDcLevel();
-		return (m_bFilter) ? LowPassFilter(in) : in;
+		m_dcAdjust.AddSample(volr);
+		m_dcAdjust.AddSample(voll);
+		short inl = voll - m_dcAdjust.GetDcLevel();
+		short inr = volr - m_dcAdjust.GetDcLevel();
+		if(m_bFilter)
+		{
+		    inl = LowPassFilter(inl);
+		    inr = LowPassFilter(inr);
+        }
+		ymsample val = //(vol << 16) + vol; 
+		((inl << 16) + inr);
+		//printf("vol:%i l:%i r:%i\n", vol, volr, voll);
+		//m_dcAdjust.AddSample(vol);
+		//const int in = vol - m_dcAdjust.GetDcLevel();
+		//return (m_bFilter) ? LowPassFilter(in) : in;
+		return val;
 }
 
 
@@ -528,34 +525,58 @@ void	CYm2149Ex::writeRegister(ymint reg,ymint data)
 		case 8:
 			registers[8] = data&31;
 			volA = ymVolumeTable[data&15];
-			volAl = Level_AL[(data & 31) * 2 + 1];
-			volAr = Level_AR[(data & 31) * 2 + 1];
+			volAl = Level_AL[(data&31) * 2 + 1];
+			volAr = Level_AR[(data&31) * 2 + 1];
 			if (data&0x10)
+			{
 				pVolA = &volE;
+				pVolAl = &volE;
+				pVolAr = &volE;
+			}
 			else
+			{
 				pVolA = &volA;
+				pVolAl = &volAl;
+				pVolAr = &volAr;
+			}
 			break;
 		
 		case 9:
 			registers[9] = data&31;
 			volB = ymVolumeTable[data&15];
-			volBl = Level_BL[(data & 31) * 2 + 1];
-			volBr = Level_BR[(data & 31) * 2 + 1];
+			volBl = Level_BL[(data&31) * 2 + 1];
+			volBr = Level_BR[(data&31) * 2 + 1];
 			if (data&0x10)
+			{
 				pVolB = &volE;
+				pVolBl = &volE;
+				pVolBr = &volE;
+			}
 			else
+			{
 				pVolB = &volB;
+				pVolBl = &volBl;
+				pVolBr = &volBr;
+			}
 			break;
 		
 		case 10:
 			registers[10] = data&31;
 			volC = ymVolumeTable[data&15];
-			volCl = Level_CL[(data & 31) * 2 + 1];
-			volCr = Level_CR[(data & 31) * 2 + 1];
+			volCl = Level_CL[(data&31) * 2 + 1];
+			volCr = Level_CR[(data&31) * 2 + 1];
 			if (data&0x10)
+			{
 				pVolC = &volE;
+				pVolCl = &volE;
+				pVolCr = &volE;
+			}
 			else
+			{
 				pVolC = &volC;
+				pVolCl = &volCl;
+				pVolCr = &volCr;
+			}
 			break;
 
 		case 11:

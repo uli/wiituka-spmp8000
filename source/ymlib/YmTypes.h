@@ -91,7 +91,7 @@ typedef		char				ymchar;			// 8 bits char character (used for null terminated st
 // Multi-platform
 //-----------------------------------------------------------
 typedef		int					ymbool;			// boolean ( theorically nothing is assumed for its size in StSound,so keep using int)
-typedef		yms16				ymsample;		// StSound emulator render mono 16bits signed PCM samples
+typedef		yms32				ymsample;		// StSound emulator render mono 16bits signed PCM samples
 
 #define		YMFALSE				(0)
 #define		YMTRUE				(!YMFALSE)

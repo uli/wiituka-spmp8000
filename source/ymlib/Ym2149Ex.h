@@ -91,7 +91,7 @@ public:
 		~CYm2149Ex();
 
 		void	reset(void);
-		void	update(signed short *pSampleBuffer,ymint nbSample);
+		void	update(int *pSampleBuffer,ymint nbSample);
 
 		void	setClock(ymu32 _clock);
 		void	writeRegister(ymint reg,ymint value);

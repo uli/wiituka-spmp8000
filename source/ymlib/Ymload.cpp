@@ -534,7 +534,7 @@ ymbool	CYmMusic::checkCompilerTypes()
 	if (4 != sizeof(ymu32)) return YMFALSE;
 	if (4 != sizeof(yms32)) return YMFALSE;
 
-	if (2 != sizeof(ymsample)) return YMFALSE;
+	if (4 != sizeof(ymsample)) return YMFALSE;
 
 #ifdef YM_INTEGER_ONLY
 	if (8 != sizeof(yms64)) return YMFALSE;
