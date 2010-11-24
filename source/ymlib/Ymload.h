@@ -35,12 +35,8 @@
 extern "C" {
 #endif
 
-#ifdef _WIN32
 #pragma pack(push)
 #pragma pack(1)
-#else
-// warning: be sure to the following struct is 1 byte aligned and exactly 22 bytes long. ( FILE header )
-#endif	// ifdef _WIN32
 
 typedef struct
 {
@@ -55,9 +51,7 @@ typedef struct
 } lzhHeader_t;
 
 
-#ifdef _WIN32
 #pragma pack(pop)
-#endif	// ifdef _WIN32
 
 #ifdef __cplusplus
 }
