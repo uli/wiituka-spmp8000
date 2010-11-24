@@ -3,6 +3,7 @@
 	ST-Sound ( YM files player library )
 
 	Copyright (C) 1995-1999 Arnaud Carre ( http://leonard.oxg.free.fr )
+	Copyright (C) 2009-2011 David Colmenero aka D_Skywalk ( http://david.dantoine.org )
 
 	Define YM types for multi-platform compilcation.
 	Change that file depending of your platform. Please respect the right size

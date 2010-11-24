@@ -3,6 +3,8 @@
 	ST-Sound ( YM files player library )
 
 	Copyright (C) 1995-1999 Arnaud Carre ( http://leonard.oxg.free.fr )
+    Copyright (C) 2009-2011 David Colmenero aka D_Skywalk ( http://david.dantoine.org )
+
 
 	Extended YM-2149 Emulator, with ATARI music demos effects.
 	(SID-Like, Digidrum, Sync Buzzer, Sinus SID and Pattern SID)

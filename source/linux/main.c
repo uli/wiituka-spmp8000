@@ -227,7 +227,7 @@ int poll_input (void)
                     else
                     {
                         emu_paused (1);
-                        ymload(rom_name);
+                        ymload_file(rom_name);
                     }
                 }
                 else

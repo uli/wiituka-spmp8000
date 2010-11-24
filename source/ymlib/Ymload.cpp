@@ -3,6 +3,8 @@
 	ST-Sound ( YM files player library )
 
 	Copyright (C) 1995-1999 Arnaud Carre ( http://leonard.oxg.free.fr )
+	Copyright (C) 2009-2011 David Colmenero aka D_Skywalk ( http://david.dantoine.org )
+
 
 	Manage YM file depacking and parsing
 
@@ -131,7 +133,7 @@ unsigned char	*CYmMusic::depackFile(ymu32 checkOriginalSize)
 		{ // Compression LH5, header !=0 : Error.
 			free(pBigMalloc);
 			pBigMalloc = NULL;
-			setLastError("LHARC Header must be 0 !");
+			setLastError((char*)"LHARC Header must be 0 !");
 			return NULL;
 		}
 
@@ -139,7 +141,7 @@ unsigned char	*CYmMusic::depackFile(ymu32 checkOriginalSize)
 		pNew = (ymu8*)malloc(fileSize);
 		if (!pNew)
 		{
-			setLastError("MALLOC Failed !");
+			setLastError((char*)"MALLOC Failed !");
 			free(pBigMalloc);
 			pBigMalloc = NULL;
 			return NULL;
@@ -167,14 +169,14 @@ unsigned char	*CYmMusic::depackFile(ymu32 checkOriginalSize)
 
 			if (!bRet)
 			{	// depacking error
-				setLastError("LH5 Depacking Error !");
+				setLastError((char*)"LH5 Depacking Error !");
 				free(pNew);
 				pNew = NULL;
 			}
 		}
 		else
 		{
-			setLastError("LH5 Depacking Error !");
+			setLastError((char*)"LH5 Depacking Error !");
 			free(pNew);
 			pNew = NULL;
 		}
@@ -215,7 +217,7 @@ ymbool	CYmMusic::deInterleave(void)
 			tmpBuff = (ymu8*)malloc(nbFrame*streamInc);
 			if (!tmpBuff)
 			{
-				setLastError("Malloc error in deInterleave()\n");
+				setLastError((char*)"Malloc error in deInterleave()\n");
 				return YMFALSE;
 			}
 
@@ -242,6 +244,8 @@ ymbool	CYmMusic::deInterleave(void)
  }
 
 
+#define MAKEID(x)   ( (x[0]<<24) | (x[1]<<16) | (x[2]<<8) | (x[3]) )
+//MAKEID('Y','M','2','!')
 
 ymbool	CYmMusic::ymDecode(void)
  {
@@ -267,11 +271,11 @@ ymbool	CYmMusic::ymDecode(void)
 				streamInc = 14;
 				nbDrum = 0;
 				setAttrib(A_STREAMINTERLEAVED|A_TIMECONTROL);
-				pSongName = mstrdup("Unknown");
-				pSongAuthor = mstrdup("Unknown");
-				pSongComment = mstrdup("Converted by Leonard.");
-				pSongType = mstrdup("YM 2");
-				pSongPlayer = mstrdup("YM-Chip driver");
+				pSongName = mstrdup((char*)"Unknown");
+				pSongAuthor = mstrdup((char*)"Unknown");
+				pSongComment = mstrdup((char*)"Converted by Leonard.");
+				pSongType = mstrdup((char*)"YM 2");
+				pSongPlayer = mstrdup((char*)"YM-Chip driver");
 				break;
 
 			case 'YM3!':		// Standart YM-Atari format.
@@ -284,11 +288,11 @@ ymbool	CYmMusic::ymDecode(void)
 				streamInc = 14;
 				nbDrum = 0;
 				setAttrib(A_STREAMINTERLEAVED|A_TIMECONTROL);
-				pSongName = mstrdup("Unknown");
-				pSongAuthor = mstrdup("Unknown");
-				pSongComment = mstrdup("");
-				pSongType = mstrdup("YM 3");
-				pSongPlayer = mstrdup("YM-Chip driver");
+				pSongName = mstrdup((char*)"Unknown");
+				pSongAuthor = mstrdup((char*)"Unknown");
+				pSongComment = mstrdup((char*)"");
+				pSongType = mstrdup((char*)"YM 3");
+				pSongPlayer = mstrdup((char*)"YM-Chip driver");
 				break;
 
 			case 'YM3b':		// Standart YM-Atari format + Loop info.
@@ -302,15 +306,15 @@ ymbool	CYmMusic::ymDecode(void)
 				streamInc = 14;
 				nbDrum = 0;
 				setAttrib(A_STREAMINTERLEAVED|A_TIMECONTROL);
-				pSongName = mstrdup("Unknown");
-				pSongAuthor = mstrdup("Unknown");
-				pSongComment = mstrdup("");
-				pSongType = mstrdup("YM 3b (loop)");
-				pSongPlayer = mstrdup("YM-Chip driver");
+				pSongName = mstrdup((char*)"Unknown");
+				pSongAuthor = mstrdup((char*)"Unknown");
+				pSongComment = mstrdup((char*)"");
+				pSongType = mstrdup((char*)"YM 3b (loop)");
+				pSongPlayer = mstrdup((char*)"YM-Chip driver");
 				break;
 
 			case 'YM4!':		// Extended ATARI format.
-				setLastError("No more YM4! support. Use YM5! format.");
+				setLastError((char*)"No more YM4! support. Use YM5! format.");
 				return YMFALSE;
 				break;
 
@@ -318,7 +322,7 @@ ymbool	CYmMusic::ymDecode(void)
 			case 'YM6!':		// Extended YM2149 format, all machines.
 				if (strncmp((const char*)(pBigMalloc+4),"LeOnArD!",8))
 				{
-					setLastError("Not a valid YM format !");
+					setLastError((char*)"Not a valid YM format !");
 					return YMFALSE;
 				}
 				ptr = pBigMalloc+12;
@@ -365,22 +369,22 @@ ymbool	CYmMusic::ymDecode(void)
 				if (id=='YM6!')
 				{
 					songType = YM_V6;
-					pSongType = mstrdup("YM 6");
+					pSongType = mstrdup((char*)"YM 6");
 				}
 				else
 				{
-					pSongType = mstrdup("YM 5");
+					pSongType = mstrdup((char*)"YM 5");
 				}
 				pDataStream = ptr;
 				streamInc = 16;
-				pSongPlayer = mstrdup("YM-Chip driver");
+				pSongPlayer = mstrdup((char*)"YM-Chip driver");
 				break;
 
 			case 'MIX1':		// ATARI Remix digit format.
 
 				if (strncmp((const char*)(pBigMalloc+4),"LeOnArD!",8))
 				{
-					setLastError("Not a valid YM format !");
+					setLastError((char*)"Not a valid YM format !");
 					return YMFALSE;
 				}
 				ptr = pBigMalloc+12;
@@ -415,8 +419,8 @@ ymbool	CYmMusic::ymDecode(void)
 				computeTimeInfo();
 
 				mixPos = -1;		// numero du block info.
-				pSongType = mstrdup("MIX1");
-				pSongPlayer = mstrdup("Digi-Mix driver");
+				pSongType = mstrdup((char*)"MIX1");
+				pSongPlayer = mstrdup((char*)"Digi-Mix driver");
 
 				break;
 
@@ -440,7 +444,7 @@ ymbool	CYmMusic::ymDecode(void)
 */
 				if (strncmp((const char*)(pBigMalloc+4),"LeOnArD!",8))
 				{
-					setLastError("Not a valid YM format !");
+					setLastError((char*)"Not a valid YM format !");
 					return YMFALSE;
 				}
 				ptr = pBigMalloc+12;
@@ -489,11 +493,11 @@ ymbool	CYmMusic::ymDecode(void)
 				{
 					ymTrackerFreqShift = (attrib>>28)&15;
 					attrib &= 0x0fffffff;
-					pSongType = mstrdup("YM-T2");
+					pSongType = mstrdup((char*)"YM-T2");
 				}
 				else
 				{
-					pSongType = mstrdup("YM-T1");
+					pSongType = mstrdup((char*)"YM-T1");
 				}
 
 
@@ -503,11 +507,11 @@ ymbool	CYmMusic::ymDecode(void)
 				ymTrackerInit(100);		// 80% de volume maxi.
 				streamInc = 16;
 				setTimeControl(YMTRUE);
-				pSongPlayer = mstrdup("Universal Tracker");
+				pSongPlayer = mstrdup((char*)"Universal Tracker");
 				break;
 
 			default:
-				setLastError("Unknow YM format !");
+				setLastError((char*)"Unknow YM format !");
 				return YMFALSE;
 				break;
 		}
@@ -523,7 +527,7 @@ ymbool	CYmMusic::ymDecode(void)
  
 ymbool	CYmMusic::checkCompilerTypes()
 {
-	setLastError("Basic types size are not correct (check ymTypes.h)");
+	setLastError((char*)"Basic types size are not correct (check ymTypes.h)");
 
 	if (1 != sizeof(ymu8)) return YMFALSE;
 	if (1 != sizeof(yms8)) return YMFALSE;
@@ -542,7 +546,7 @@ ymbool	CYmMusic::checkCompilerTypes()
 
 	if (sizeof(ymint) < 4) return YMFALSE;		// ymint should be at least 32bits
 
-	setLastError("");
+	setLastError((char*)"");
 	return YMTRUE;
 }
 
@@ -561,7 +565,7 @@ FILE	*in;
 		in = fopen(fileName,"rb");
 		if (!in)
 		{
-			setLastError("File not Found");
+			setLastError((char*)"File not Found");
 			return YMFALSE;
 		}
 
@@ -572,7 +576,7 @@ FILE	*in;
 		pBigMalloc = (unsigned char*)malloc(fileSize);
 		if (!pBigMalloc)
 		{
-			setLastError("MALLOC Error");
+			setLastError((char*)"MALLOC Error");
 			fclose(in);
 			return YMFALSE;
 		}
@@ -583,7 +587,7 @@ FILE	*in;
 		if (fread(pBigMalloc,1,fileSize,in)!=(size_t)fileSize)
 		{
 			free(pBigMalloc);
-			setLastError("File is corrupted.");
+			setLastError((char*)"File is corrupted.");
 			fclose(in);
 			return YMFALSE;
 		}
@@ -631,7 +635,7 @@ ymbool	CYmMusic::loadMemory(void *pBlock,ymu32 size)
 		pBigMalloc = (unsigned char*)malloc(fileSize);
 		if (!pBigMalloc)
 		{
-			setLastError("MALLOC Error");
+			setLastError((char*)"MALLOC Error");
 			return YMFALSE;
 		}
 

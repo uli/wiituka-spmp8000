@@ -3,6 +3,7 @@
     ST-Sound ( YM files player library )
 
     Copyright (C) 1995-1999 Arnaud Carre ( http://leonard.oxg.free.fr )
+	Copyright (C) 2009-2011 David Colmenero aka D_Skywalk ( http://david.dantoine.org )
 
     This is a sample program: it's a real-time YM player using windows WaveOut API.
 
@@ -48,7 +49,7 @@ int ym_playing = 0;
 volatile YMMUSIC * s_pMusic = NULL;
 
 
-int ymload( char* filename )
+int ymload_file( char* filename )
 {
 
     if(ym_playing != 0) //playing or closing
@@ -86,6 +87,44 @@ int ymload( char* filename )
     return 1;
 
 }
+
+
+int ymload_buffer( char* buffer, int size )
+{
+
+    if(ym_playing != 0) //playing or closing
+        return 0;
+
+    //--------------------------------------------------------------------------
+    // Load YM music and creates WAV file
+    //--------------------------------------------------------------------------
+    printf("Loading music from buffer...\n");
+    YMMUSIC * pMusic = ymMusicCreate();
+
+    if (ymMusicLoadMemory(pMusic,buffer,size))
+    {
+        ymMusicInfo_t info;
+        ymMusicGetInfo(pMusic,&info);
+        printf("Name.....: %s\n",info.pSongName);
+
+        ymMusicSetLoopMode(pMusic,YMTRUE);
+        ymMusicPlay(pMusic);
+        s_pMusic = pMusic;        // global instance for soundserver callback
+        ym_playing = 1;
+
+        StopSound (0); // SDL callback started
+    }
+    else
+    {
+        printf("Error in loading ym buffer:\n%s\n", ymMusicGetLastError(pMusic));
+    }
+
+    return 1;
+
+}
+
+
+
 
 void ymclose(void)
 {

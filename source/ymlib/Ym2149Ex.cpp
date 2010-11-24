@@ -3,6 +3,7 @@
 	ST-Sound ( YM files player library )
 
 	Copyright (C) 1995-1999 Arnaud Carre ( http://leonard.oxg.free.fr )
+	Copyright (C) 2009-2011 David Colmenero aka D_Skywalk ( http://david.dantoine.org )
 
 	Extended YM-2149 Emulator, with ATARI music demos effects.
 	(SID-Like, Digidrum, Sync Buzzer, Sinus SID and Pattern SID)
@@ -55,14 +56,20 @@ static	const ymint *	EnvWave[16] = {	Env00xx,Env00xx,Env00xx,Env00xx,
 										Env1100,Env1101,Env1110,Env1111};
 
 static	ymint ymVolumeTable[16] =
-{	62,161,265,377,580,774,1155,1575,2260,3088,4570,6233,9330,13187,21220,32767};
+{
+// Amplitude table by D_Skywalk - for Wiituka YM Player
+   0,        836>>2,   1212>>2,  1773>>2,  2619>>2,  3875>>1,  5397>>1,  8823>>1,
+   10392>>1, 16706>>1, 23339>>1, 29292>>1, 36969>>1, 46421>>1, 55195>>1, 65535>>1
 
-// Amplitude table (c)Hacker KAY
-extern yms16 Amplitudes_AY[16];
-//ymint Amplitudes_AY[16] = {
-//   0, 836, 1212, 1773, 2619, 3875, 5397, 8823,
-//   10392, 16706, 23339, 29292, 36969, 46421, 55195, 65535
-//};
+// Amplitude table (c) ST-Sound
+// 62,       161,      265,      377,      580,      774,      1155,     1575,
+// 2260,     3088,     4570,     6233,     9330,     13187,    21220,    32767
+
+// Amplitude table (c)Hacker KAY - Wiituka
+// 0,        836,      1212,     1773,     2619,     3875,     5397,     8823,
+// 10392,    16706,    23339,    29292,    36969,    46421,    55195,    65535
+};
+
 ymint Level_AR[32], Level_AL[32], Level_BR[32], Level_BL[32], Level_CR[32], Level_CL[32];
 ymu8 Index_AL, Index_AR, Index_BL, Index_BR, Index_CL, Index_CR;
 
