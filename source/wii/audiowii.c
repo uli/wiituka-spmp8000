@@ -152,7 +152,7 @@ void StopSound ( int val )
             break;    
 
         case 0:
-            if (MP3Player_IsPlaying()) { MP3Player_Stop(); }
+            //if (MP3Player_IsPlaying()) { MP3Player_Stop(); }
             ASND_Pause(1);
             AUDIO_StopDMA();
             AUDIO_InitDMA((u32) sound_buffer[sb], SFX_THREAD_FRAG_SIZE);

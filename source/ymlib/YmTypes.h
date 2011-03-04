@@ -40,32 +40,9 @@
 // Platform specific stuff
 //-----------------------------------------------------------
 
-#ifdef _WIN32
-
-// These settings are ok for Windows 32bits platform.
 
 #ifdef YM_INTEGER_ONLY
-typedef		__int64				yms64;
-#else
-typedef		float				ymfloat;
-#endif
-
-typedef		signed char			yms8;			//  8 bits signed integer
-typedef		signed short		yms16;			// 16 bits signed integer
-typedef		signed long			yms32;			// 32 bits signed integer
-
-typedef		unsigned char		ymu8;			//  8 bits unsigned integer
-typedef		unsigned short		ymu16;			// 16 bits unsigned integer
-typedef		unsigned long		ymu32;			// 32 bits unsigned integer
-
-typedef		int					ymint;			// Native "int" for speed purpose. StSound suppose int is signed and at least 32bits. If not, change it to match to yms32
-
-typedef		char				ymchar;			// 8 bits char character (used for null terminated strings)
-
-#else
-
-#ifdef YM_INTEGER_ONLY
-typedef		int64_t				yms64;
+typedef		long				yms64;
 #else
 typedef		float				ymfloat;
 #endif
@@ -81,8 +58,6 @@ typedef		unsigned int		ymu32;			// 32 bits unsigned integer
 typedef		int					ymint;			// Native "int" for speed purpose. StSound suppose int is signed and at least 32bits. If not, change it to match to yms32
 
 typedef		char				ymchar;			// 8 bits char character (used for null terminated strings)
-
-#endif
 
 #ifndef NULL
 #define NULL	(0L)

@@ -11,8 +11,8 @@ s32 tcp_socket (void);
 s32 tcp_connect (char *host, const u16 port);
 
 char * tcp_readln (const s32 s, const u16 max_length, const u64 start_time, const u16 timeout);
-bool tcp_read (const s32 s, u8 **buffer, const u32 length);
-bool tcp_write (const s32 s, const u8 *buffer, const u32 length);
+int tcp_read (const s32 s, u8 **buffer, const u32 length);
+int tcp_write (const s32 s, const u8 *buffer, const u32 length);
 
 #define HTTP_TIMEOUT 300000
 

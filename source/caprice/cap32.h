@@ -130,7 +130,7 @@ typedef struct {
    unsigned char BCx[2];
    unsigned char DEx[2];
    unsigned char HLx[2];
-   unsigned char ga_pen;
+   unsigned char ga_pen; //0x46
    unsigned char ga_ink_values[17];
    unsigned char ga_ROM_config;
    unsigned char ga_RAM_config;
@@ -140,7 +140,7 @@ typedef struct {
    unsigned char ppi_A;
    unsigned char ppi_B;
    unsigned char ppi_C;
-   unsigned char ppi_control;
+   unsigned char ppi_control; //0x82
    unsigned char psg_reg_select;
    unsigned char psg_registers[16];
    unsigned char ram_size[2];

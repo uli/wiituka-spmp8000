@@ -24,7 +24,7 @@ include $(DEVKITPPC)/wii_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	wiituka
 BUILD		:=	build
-SOURCES		:=	source/wii source/caprice source/port source/wii/gfx source/wii/libpngu source/wii/grrlib source/wii/menu source/wii/wpad_leds source/wii/tcp source/wii/images source/wii/fonts source/wii/sound
+SOURCES		:=	source/wii source/caprice source/port source/ymlib source/wii/gfx source/wii/libpngu source/wii/grrlib source/wii/menu source/wii/wpad_leds source/wii/tcp source/wii/images source/wii/fonts source/wii/sound
 DATA		:=	data  
 INCLUDES	:=      
 
@@ -80,6 +80,8 @@ BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
 TTFFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.ttf)))
 PNGFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.png)))
 MP3FILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.mp3)))
+ymFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.ym)))
+YMFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.YM)))
 
 #---------------------------------------------------------------------------------
 # use CXX for linking C++ projects, CC for standard C

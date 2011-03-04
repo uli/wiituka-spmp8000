@@ -359,7 +359,7 @@ bool ButtonsCommon (int command, sMenuEntry * current)
         else if((controls.wpad1.bDown & (WPAD_BUTTON_RIGHT|WPAD_BUTTON_PLUS)) && ((glistposition + ROWS_PER_SCREEN) < (WiiStatus.nRoms)))
         {
             menuthread_callanimButtons(0, current);
-            if (MP3Player_IsPlaying()) { MP3Player_Stop(); }
+            //if (MP3Player_IsPlaying()) { MP3Player_Stop(); }
         }
     }
 
@@ -647,7 +647,7 @@ void MenuClose(void)
 
     Cursor_Free(&cursor);
 
-    if (MP3Player_IsPlaying()) { MP3Player_Stop(); }
+    //if (MP3Player_IsPlaying()) { MP3Player_Stop(); }
 
 }
 
@@ -686,7 +686,7 @@ void ShowSplash (void)
     //UpdateScreen();
 
     //sleep(5);
-    MP3Player_Volume(200);
+    //MP3Player_Volume(200);
 
     while( !ended )
     {
@@ -728,10 +728,11 @@ char music_string[255] = {""};
 int  music_banner = 640; 
 void PlayBgMusic (void)
 {
-
+#if 0
     static u32 music_timer = 0;
 
-    if (MP3Player_IsPlaying())
+    //if (MP3Player_IsPlaying())
+    if(ym_playing == 1)
     {
         music_timer = GetTicks();
         return;
@@ -743,31 +744,30 @@ void PlayBgMusic (void)
         switch(music_rand)
         {
             case 1:
-                MP3Player_PlayBuffer(bckg_a_mp3, bckg_a_mp3_size, NULL);
+                //MP3Player_PlayBuffer(bckg_a_mp3, bckg_a_mp3_size, NULL);
                 strcpy(music_string, "Music by Cesar Astudillo (Gominolas) of the game Titanic");
                 break;
 
             case 2:
-            case 3:
-/*
-                MP3Player_PlayBuffer(bckg_b_mp3, bckg_b_mp3_size, NULL);
+
+                //MP3Player_PlayBuffer(bckg_b_mp3, bckg_b_mp3_size, NULL);
                 strcpy(music_string, "Music by Cerror - A beginning");
                 break;
 
             case 3:
-                MP3Player_PlayBuffer(bckg_c_mp3, bckg_c_mp3_size, NULL);
+                //MP3Player_PlayBuffer(bckg_c_mp3, bckg_c_mp3_size, NULL);
                 strcpy(music_string, "Music by Ultrasyd - Lost in Fractal Dimension");
                 break;
-*/
+
             case 4:
-                MP3Player_PlayBuffer(bckg_d_mp3, bckg_d_mp3_size, NULL);
+                //MP3Player_PlayBuffer(bckg_d_mp3, bckg_d_mp3_size, NULL);
                 strcpy(music_string, "Music by Fenyx Kell - Solarium");
                 break;
         }
          
         music_banner = 640; 
    }
-   
+#endif   
  
 }
 
@@ -786,13 +786,13 @@ void ShowMenu (int nMenu)
 
     DrawTexture(&fondo, 0, 0, 0, 1, 1, 255);
 
-    //sprintf(debugt,"DEBUG: ROM(%s) - p(%i) n(%i) ", globalRom.filename, glistposition, WiiStatus.nRoms);
+    sprintf(debugt,"DEBUG: ROM(%s) - p(%i) n(%i) ", globalRom.filename, glistposition, WiiStatus.nRoms);
 
-    sprintf(debugt,"HELP: (A) LOAD ROM + AUTORUN");
+    //sprintf(debugt,"HELP: (A) LOAD ROM + AUTORUN");
     PrintW (100, 400, debugt);
     sprintf(debugt,"      (B) ONLY LOAD ROM");
     PrintW (100, 410, debugt);
-    sprintf(debugt,"Wiituka v0.98.8" );
+    sprintf(debugt,"Wiituka v0.98.9 - BETA" );
     PrintW (20, 450, debugt);
 
     if(music_banner > -640)

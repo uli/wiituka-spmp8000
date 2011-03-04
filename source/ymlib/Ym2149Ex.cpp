@@ -131,10 +131,6 @@ CYm2149Ex::CYm2149Ex(ymu32 masterClock,ymint prediv,ymu32 playRate)
 {
 ymint i,env;
 
-   int b, l, r;
-   int Index_A, Index_B, Index_C;
-   double k;
-
    Index_AL = 255;
    Index_AR = 13;
    Index_BL = 170;
@@ -396,11 +392,8 @@ int CYm2149Ex::LowPassFilter(int in, int channel)
 
 ymsample CYm2149Ex::nextSample(void)
 {
-ymint vol;
 ymint voll, volr;
 ymint bt,bn;
-
-        static int channel = 0;
 
 		if (noisePos&0xffff0000)
 		{

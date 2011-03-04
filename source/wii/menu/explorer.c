@@ -424,7 +424,7 @@ bool Explorer_dirRead ( void )
 		strcpy(pnode.gfile.filename, filename);
 		pnode.gfile.location = SU_SD;
 
-		if(_FileList_InsertGame(&pnode))
+		if(_FileList_InsertGame(&pnode)) // TODO: HACER FLUSH PARA EVITAR CUELGUES? 
 			ngames++; //to use in debug mode
 
            }
@@ -480,7 +480,8 @@ void _nfoRead(t_infnode * ginfo, char * filename) //añadir modo online
        if (!(iErrorCode = zipBuffered_extract( ebuffer, file.buffer, zinfo.dwOffset))) {
            _nfoParse(ginfo, (char *) ebuffer, zinfo.unZipSize);
        }
-       free(ebuffer);
+
+       free(ebuffer);
    }
 
    free(file.buffer);

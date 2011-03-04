@@ -19,7 +19,6 @@
 #include <wiiuse/wpad.h>
 #include <ogc/lwp_watchdog.h>
 #include <asndlib.h>
-#include <mp3player.h>
 
 #include "grrlib/GRRLIB.h"
 #include "../global.h"
@@ -185,8 +184,8 @@ void MP3Init (void)
 {
     // Splash Music!!
     ASND_Init(NULL);
-    MP3Player_Init();
-    MP3Player_PlayBuffer(intro_mp3, intro_mp3_size, NULL);
+    //MP3Player_Init();
+    //MP3Player_PlayBuffer(intro_mp3, intro_mp3_size, NULL);
 }
 
 
@@ -210,7 +209,7 @@ int main(int argc, char *argv[]) {
 
     DevicesInit();
 
-    MP3Init();
+    SNDInit();
 
     ShowSplash ();
 

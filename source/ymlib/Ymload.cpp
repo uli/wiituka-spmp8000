@@ -350,7 +350,8 @@ ymbool	CYmMusic::ymDecode(void)
 								ymu8 *pw = pDrumTab[i].pData;
 								for (j=0;j<pDrumTab[i].size;j++)
 								{
-									*pw++ = ymVolumeTable[(*pw)&15]>>7;
+								    *pw = ymVolumeTable[(*pw)&15]>>7;
+								    pw++;
 								}
 							}
 							ptr += pDrumTab[i].size;

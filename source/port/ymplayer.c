@@ -3,7 +3,7 @@
     ST-Sound ( YM files player library )
 
     Copyright (C) 1995-1999 Arnaud Carre ( http://leonard.oxg.free.fr )
-	Copyright (C) 2009-2011 David Colmenero aka D_Skywalk ( http://david.dantoine.org )
+    Copyright (C) 2009-2011 David Colmenero aka D_Skywalk ( http://david.dantoine.org )
 
     This is a sample program: it's a real-time YM player using windows WaveOut API.
 
@@ -32,7 +32,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <SDL.h>
 
 #define    REPLAY_RATE         48000
 #define    REPLAY_DEPTH        16
