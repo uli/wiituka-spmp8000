@@ -263,7 +263,7 @@ int loadBuffered_rom (void * rbuffer, int bSize);
 
 /* MODOS */
 
-#ifdef SPMP
+#if defined(SPMP) || defined(__linux__)
 #define HRES 272
 #define WRES 384
 #else

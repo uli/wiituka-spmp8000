@@ -6,7 +6,7 @@ LINKER = gpp
 
 ARFLAGS = rcs
 
-GFLAGS	= -Wall `sdl-config --cflags` -DLINUX
+GFLAGS	= -Wall `sdl-config --cflags` -DLINUX -Iymlib
 
 ifdef RELEASE
 CFLAGS	= $(GFLAGS) -O2 -funroll-loops -ffast-math -fomit-frame-pointer -fno-strength-reduce -finline-functions -s
@@ -14,7 +14,7 @@ else
 CFLAGS	= $(GFLAGS) -ggdb
 endif
 
-LIBS = `sdl-config --libs` -lz -lstdc++
+LIBS = `sdl-config --libs` -lz -lstdc++ -lm
 
 CXXFLAGS= -Iymlib -ggdb
 

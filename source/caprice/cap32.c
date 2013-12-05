@@ -3024,7 +3024,7 @@ void loadConfiguration (void)
    CPC.scr_fs_height = HRES; 
    CPC.scr_fs_bpp = 16;
 
-#ifdef SPMP
+#if defined(SPMP) || defined(__linux__)
    CPC.scr_style = 1;
 #else
    CPC.scr_style = 2;

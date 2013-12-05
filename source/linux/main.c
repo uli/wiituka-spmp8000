@@ -25,19 +25,13 @@ typedef unsigned int bool;
 void *pix = NULL;
 SDL_AudioSpec *audio_spec = NULL;
 
-extern Bitu8 pituka_arranque[];
-extern Bitu16 pituka_pal[];
-
 extern Bitu8 *pbSndBuffer;
 extern Bitu8 *pbSndBufferEnd;
 extern Bitu8 *pbSndStream;
 extern t_CPC CPC;
 extern int emuDone;
 
-unsigned short pituka_surface[320*240];
-
 SDL_Surface *screen;
-int screen_bps;
 Bitu16 *screen_base;
 
 WiituKa_Status WiiStatus = {0,0,0,0,0,0,0,0,0,0};
@@ -83,7 +77,7 @@ static int init_linux (void)
     if(SDL_Init(SDL_INIT_VIDEO |SDL_INIT_AUDIO) < 0) //| SDL_INIT_JOYSTICK
         return 0;
 
-    screen = SDL_SetVideoMode(WRES, HRES, 16, SDL_SWSURFACE);
+    screen = SDL_SetVideoMode(WRES, HRES + 1, 16, SDL_SWSURFACE);
     if (!screen) {
         fprintf(stderr, "Couldn't set video mode: %s\n", SDL_GetError());
         return 0;
@@ -96,7 +90,6 @@ static int init_linux (void)
         SDL_LockSurface(screen);
     }
 
-    screen_bps = screen->pitch / 4; // rendered screen line length (changing bytes to dwords)
     screen_base = (Bitu16 *)screen->pixels; // memory address of back buffer
     if (SDL_MUSTLOCK(screen)) {
         SDL_UnlockSurface(screen);
@@ -111,73 +104,20 @@ inline void linux_draw_bit (Bitu16 *p, Bitu8 v)
 }
 
 
-void CleanScreen (void)
-{
-    SDL_FillRect(screen,NULL,SDL_MapRGB(screen->format,0,0,0));
-    SDL_Flip(screen);
-}
-
 void UpdateScreen (void) 
 {
-    register int x;
-    Bitu16 *dest = NULL, *src = NULL;
-
-    if (SDL_MUSTLOCK(screen)) {
-        if ( SDL_LockSurface(screen) < 0 ){ //Bloqueo el Surface
-            return;
-        }
-    }
-
-    dest = (Bitu16*) (screen_base + 0);
-    src = (Bitu16*) (pix + 0);
-
-    for (x=0; x < WRES*HRES ; x++)
-    *(dest++) = (Bitu16) *(src++);
-
-
-    if (SDL_MUSTLOCK(screen)) {
-        SDL_UnlockSurface(screen);
-    }
-
-    SDL_Flip(screen);
+    //actualizado directamente en emulacion
 }
 
 #define CENTRADO_LOGO 32
 
-void FillScreenPal ( unsigned char * surface )
-{
-    Bitu8 * src = surface;
-    Bitu16 *dest = NULL;
-    register int x, y;
-
-    dest = (Bitu16*) (pix + WRES*CENTRADO_LOGO);
-
-    for(y=0; y < 240; y++){ //tamaño del logo original 320x240
-        dest+=CENTRADO_LOGO; 
-
-        for (x=0; x < 320 ; x++)
-            linux_draw_bit((Bitu16*)dest++, *(src++));
-
-        dest+=CENTRADO_LOGO; 
-    }
-}
-
-void FillScreenBuffer ( void * surface ) 
-{
-    Bitu8 * src = surface;
-    Bitu16 *dest = NULL;
-    register int x;
-
-    dest = (Bitu16*) (pix + 0);
-
-    for (x=0; x < HRES*WRES ; x++)
-        *(dest++) = (Bitu16) *(src++);
-
-}
-
 void FillScreen( int Updated )
 {
-    //actualizado directamente en emulacion
+    if (Updated) {
+        //printf("update\n");
+        memcpy(screen->pixels, pix, WRES * HRES * 2);
+        SDL_Flip(screen);
+    }
 }
 
 Bitu8 event2key (SDL_Event event)
@@ -189,24 +129,6 @@ Bitu8 event2key (SDL_Event event)
     }
 }
 
-
-int linux_input (void)
-{
-    SDL_Event event;
-
-    while(SDL_PollEvent(&event)){
-
-        switch (event.type) {
-            case SDL_KEYDOWN:
-            case SDL_JOYBUTTONDOWN:
-            case SDL_QUIT:
-                return 1;
-                break;
-        }
-    }
-
-    return 0;
-}
 
 int poll_input (void) 
 {
@@ -234,10 +156,14 @@ int poll_input (void)
                 {
                 
                 WiiStatus.LoadDISK = 2;
-                strcpy(rom_name, "../../shinobi.zip");
+                strcpy(rom_name, "disc.dsk");
                 printf("ROM: %s\n", rom_name);
+#if 0
                 emu_paused (1);
                 emulator_reset(true);
+#else
+                loadFiled_rom(rom_name);
+#endif
                 
                 }
                 break;
@@ -366,7 +292,7 @@ int init_buffer (void)
 {
     pbGPBuffer = (Bitu8*) malloc(128*1024); //need by unzip lib
 
-    pix = (void *)malloc(4 * WRES * HRES);
+    pix = (void *)malloc(2 * WRES * (HRES+1));
     if(pix == NULL)
         return 0;
 
@@ -375,11 +301,13 @@ int init_buffer (void)
 
 void close_buffer (void)
 {
+#if 1
     if(pix != NULL)
     {
         free(pix);
         pix = NULL;
     }
+#endif
 
     free(pbGPBuffer);
 }
