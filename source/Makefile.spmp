@@ -27,6 +27,7 @@ OBJS	= \
 LIBS	= -lgame -lc -lgcc -lstdc++ -lz -lm
 
 CFLAGS = -g -O3 -Iymlib -DSPMP
+CFLAGS += -fprofile-use
 
 include $(LIBSPMP8K)/main.cfg
 include $(LIBGAME)/libgame.mk

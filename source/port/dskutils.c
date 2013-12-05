@@ -20,7 +20,7 @@
 #include <fat.h>
 #endif
 
-#ifdef SPMP
+#if defined(SPMP) && !defined(__linux__)
 #include <libgame.h>
 #else
 #include <dirent.h>

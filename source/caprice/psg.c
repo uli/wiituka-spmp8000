@@ -521,7 +521,7 @@ inline void Synthesizer_Mixer_Q(void)
 }
 
 
-#ifdef SPMP
+#if defined(SPMP) && !defined(__linux__)
 void SoundUpdate(int count);
 #endif
 
@@ -549,7 +549,7 @@ void Synthesizer_Stereo16(void)
    if (CPC.snd_bufferptr >= pbSndBufferEnd) {
       CPC.snd_bufferptr = pbSndBuffer;
    }
-#ifdef SPMP
+#if defined(SPMP) && !defined(__linux__)
    SoundUpdate(8);
 #endif
 }
@@ -679,6 +679,9 @@ void Synthesizer_Mono16(void)
    if (CPC.snd_bufferptr >= pbSndBufferEnd) {
       CPC.snd_bufferptr = pbSndBuffer;
    }
+#if defined(SPMP) && !defined(__linux__)
+   SoundUpdate(2);
+#endif
 }
 
 

@@ -11,18 +11,22 @@ GFLAGS	= -Wall `sdl-config --cflags` -DLINUX -Iymlib
 ifdef RELEASE
 CFLAGS	= $(GFLAGS) -O2 -funroll-loops -ffast-math -fomit-frame-pointer -fno-strength-reduce -finline-functions -s
 else
-CFLAGS	= $(GFLAGS) -ggdb
+CFLAGS	= $(GFLAGS) -O3 -ggdb -DSPMP
+CFLAGS += -fprofile-generate -ftest-coverage
 endif
 
 LIBS = `sdl-config --libs` -lz -lstdc++ -lm
 
 CXXFLAGS= -Iymlib -ggdb
 
-pituka: caprice/cap32.c caprice/crtc.o caprice/fdc.o caprice/psg.o caprice/tape.o caprice/z80.o linux/main.o port/utils.o port/dskutils.o port/unzip.o port/ymplayer.o ymlib/ymlib.a caprice/cap32.h caprice/z80.h
-	gcc $(CFLAGS) $(IPATHS) -o pituka caprice/cap32.c linux/main.o port/utils.o port/dskutils.o port/unzip.o caprice/crtc.o caprice/fdc.o caprice/psg.o caprice/tape.o caprice/z80.o port/ymplayer.o ymlib/ymlib.a $(LIBS)
+pituka: caprice/cap32.o caprice/crtc.o caprice/fdc.o caprice/psg.o caprice/tape.o caprice/z80.o linux/main.o port/utils.o port/dskutils.o port/unzip.o port/ymplayer.o ymlib/ymlib.a caprice/cap32.h caprice/z80.h
+	gcc $(CFLAGS) $(IPATHS) -o pituka caprice/cap32.o linux/main.o port/utils.o port/dskutils.o port/unzip.o caprice/crtc.o caprice/fdc.o caprice/psg.o caprice/tape.o caprice/z80.o port/ymplayer.o ymlib/ymlib.a $(LIBS)
 
 main.o: linux/main.c caprice/cap32.h caprice/crtc.h caprice/z80.h
 	$(CC) $(CFLAGS) -c linux/main.c
+
+cap32.o: caprice/cap32.h caprice/crtc.h caprice/tape.h caprice/z80.h
+	$(CC) $(CFLAGS) -c caprice/cap32.c
 
 crtc.o: caprice/crtc.c caprice/cap32.h caprice/crtc.h caprice/z80.h
 	$(CC) $(CFLAGS) -c caprice/crtc.c
