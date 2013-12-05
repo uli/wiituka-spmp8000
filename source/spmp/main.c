@@ -413,8 +413,10 @@ int main(int argc, char *argv[]) {
 #endif
 
     printf("ARM frequency %d\n", GetArmCoreFreq());
+#if 0
     changeARMFreq(333);
     printf("ARM frequency %d\n", GetArmCoreFreq());
+#endif
     
     libgame_chdir_game();
     _ecos_mkdir("caprice", 0666);
