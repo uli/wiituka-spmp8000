@@ -566,7 +566,6 @@ int load_rom(t_WiiRom * romfs)
     return result;
 }
 
-#define AUDIO_BUF_SIZE (48000/50)
 emu_sound_params_t sp;
 uint64_t last_sound = 0;
 unsigned int GetTicks(void)
@@ -663,11 +662,10 @@ int SoundSetup (void)
 
 void SoundInit (void)
 {
-    sp.rate = 48000;
+    sp.rate = 44100;
     sp.channels = SOUND_CHANNELS;
     sp.depth = 0;
     sp.callback = 0;
-    //sp.buf_size = AUDIO_BUF_SIZE * 2 * 2;
     emuIfSoundInit(&sp);
 }
 
