@@ -338,7 +338,8 @@ static byte cc_ex[256] = {
     8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0
 };
 
-
+#define likely(x)      __builtin_expect(!!(x), 1)
+#define unlikely(x)    __builtin_expect(!!(x), 0)
 
 extern byte *membank_read[4], *membank_write[4];
 
@@ -415,7 +416,7 @@ unsigned char alt=1;
 #define z80_wait_states \
 { \
    access_video_memory(iCycleCount >> 2); \
-   if (CPC.snd_enabled) { \
+   if (likely(CPC.snd_enabled)) { \
       PSG.cycle_count.high += iCycleCount; \
       if (PSG.cycle_count.high >= CPC.snd_cycle_count_init.high) { \
          PSG.cycle_count.both -= CPC.snd_cycle_count_init.both; \
@@ -1049,7 +1050,11 @@ int z80_execute(void)
 {
    byte bOpCode;
 
+#ifdef SPMP
+   for (;;) {
+#else
    while (_PCdword != z80.break_point) { // loop until break point
+#endif
 
       #ifdef DEBUG_Z80
       dbg_z80_diff = abs(dbg_z80_lastPC - _PC);
@@ -1062,11 +1067,13 @@ int z80_execute(void)
       dbg_z80_lastPC = _PC;
       #endif
 
+#ifndef SPMP
       if (dwMF2Flags & MF2_RUNNING) {
          if (_PCdword == dwMF2ExitAddr) { // have we returned from the MF2?
             dwMF2Flags = MF2_INVISIBLE; // clear running flag and make the MF2 'invisible'
          }
       }
+#endif
 
       bOpCode = read_mem(_PC++);
       iCycleCount = cc_op[bOpCode];
@@ -1346,11 +1353,14 @@ int z80_execute(void)
       }
       iWSAdjust = 0;
 
+#ifndef SPMP
       if (z80.trace) { // tracing instructions?
          z80.trace = 0; // reset trace condition
          return EC_TRACE; // exit emulation loop
       }
-      else if (VDU.frame_completed) { // video emulation finished building frame?
+      else 
+#endif
+      if (VDU.frame_completed) { // video emulation finished building frame?
          VDU.frame_completed = 0;
          return EC_FRAME_COMPLETE; // exit emulation loop
       }
