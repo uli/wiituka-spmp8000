@@ -1,0 +1,49 @@
+LIBSPMP8K = ../../..
+
+TARGET	= pituka
+
+OBJS	= \
+./caprice/cap32.o \
+./port/ymplayer.o \
+./port/utils.o \
+./port/unzip.o \
+./port/dskutils.o \
+./caprice/fdc.o \
+./caprice/z80.o \
+./caprice/tape.o \
+./caprice/crtc.o \
+./caprice/psg.o \
+./spmp/main.o \
+./ymlib/YmMusic.o \
+./ymlib/YmUserInterface.o \
+./ymlib/Ym2149Ex.o \
+./ymlib/Ymload.o \
+./ymlib/LZH/LzhLib.o \
+./ymlib/digidrum.o \
+./spmp/ui.o \
+./spmp/small_keyboard.o \
+./spmp/cursor_point.o \
+
+LIBS	= -lgame -lc -lgcc -lstdc++ -lz -lm
+
+CFLAGS = -g -O3 -Iymlib -DSPMP
+
+include $(LIBSPMP8K)/main.cfg
+include $(LIBGAME)/libgame.mk
+
+install: all
+	spmount || true
+	cp $(TARGET).bin /spmp/GAME/
+	sync
+	spoff
+
+spmp/small_keyboard.rgb: spmp/small_keyboard.png
+	ffmpeg -y -vcodec png -i $< -vcodec rawvideo -f rawvideo -pix_fmt rgb565 $@
+spmp/small_keyboard.h: spmp/small_keyboard.c
+spmp/small_keyboard.c: spmp/small_keyboard.rgb
+	$(BIN2C) $< $@
+spmp/cursor_point.rgb: spmp/cursor_point.png
+	ffmpeg -y -vcodec png -i $< -vf scale=20:20 -vcodec rawvideo -f rawvideo -pix_fmt rgb565 $@
+spmp/cursor_point.h: spmp/cursor_point.c
+spmp/cursor_point.c: spmp/cursor_point.rgb
+	$(BIN2C) $< $@
