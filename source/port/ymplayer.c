@@ -33,6 +33,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "ymplayer.h"
+
 #define    REPLAY_RATE         48000
 #define    REPLAY_DEPTH        16
 #define    REPLAY_SAMPLELEN        (REPLAY_DEPTH/8)

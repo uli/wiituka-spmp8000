@@ -263,12 +263,21 @@ int loadBuffered_rom (void * rbuffer, int bSize);
 
 /* MODOS */
 
+#ifdef SPMP
+#define HRES 272
+#define WRES 384
+#else
 #define HRES 272 * 2
 #define WRES 384 * 2
+#endif
 
 #define CONST_ZOOM_RATIO 0.833 //1.667
 
+#ifdef SPMP
+#define CPC_ROOTDIR "caprice"
+#else
 #define CPC_ROOTDIR "/APPS/WIITUKA"
+#endif
 #define CPC_ROMSDIR CPC_ROOTDIR "/DISKS"
 #define CPC_SAVEDIR CPC_ROOTDIR "/SAVES"
 #define CPC_SCFGDIR CPC_SAVEDIR "/CFG"

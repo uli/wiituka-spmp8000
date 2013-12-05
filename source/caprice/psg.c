@@ -521,10 +521,12 @@ inline void Synthesizer_Mixer_Q(void)
 }
 
 
+#ifdef SPMP
+void SoundUpdate(int count);
+#endif
 
 void Synthesizer_Stereo16(void)
 {
-
    int Tick_Counter = 0;
    while (LoopCount.Hi) {
       Synthesizer_Logic_Q();
@@ -547,7 +549,9 @@ void Synthesizer_Stereo16(void)
    if (CPC.snd_bufferptr >= pbSndBufferEnd) {
       CPC.snd_bufferptr = pbSndBuffer;
    }
-
+#ifdef SPMP
+   SoundUpdate(8);
+#endif
 }
 
 

@@ -20,8 +20,12 @@
 #include <fat.h>
 #endif
 
+#ifdef SPMP
+#include <libgame.h>
+#else
 #include <dirent.h>
 #include "sys/dir.h"
+#endif
 
 #ifndef GEKKO
   typedef unsigned int bool;
@@ -29,6 +33,15 @@
 
 #include "../global.h"
 #include "dskutils.h"
+
+#ifdef SPMP
+#define DIR _ecos_DIR
+#define opendir _ecos_opendir
+#define closedir _ecos_closedir
+#define readdir _ecos_readdir
+#define chdir __dont_chdir_on_SPMP
+#define mkdir _ecos_mkdir
+#endif
 
 #define DSK_TRACKMAX    102   // max amount that fits in a DSK header
 #define DSK_SIDEMAX     2
@@ -405,7 +418,7 @@ bool Explorer_fileRead ( t_filebuf * file, char * path )
 
 
 
-
+#ifndef SPMP
 bool CreateDirs (char *path)
 {
     char temp[512];
@@ -483,6 +496,7 @@ bool CreateDirs (char *path)
     
     return true;
 }
+#endif
 
 int snapshot_save (char *pchFileName);
 int snapshot_load (char *pchFileName);

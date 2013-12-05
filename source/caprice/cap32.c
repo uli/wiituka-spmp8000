@@ -2847,6 +2847,16 @@ void video_set_style (void)
                dwYScale = 4;
                break;
 
+            case 1: // regular size
+               mode_handler[0] = draw16bpp_mode0;
+               mode_handler[1] = draw16bpp_mode1;
+               mode_handler[2] = draw16bpp_mode2;
+               mode_handler[3] = draw16bpp_mode0;
+               border_handler = draw16bpp_border;
+               dwXScale = 1;
+               dwYScale = 2;
+               break;
+
             case 3: // half size
                mode_handler[0] = draw16bpp_mode0_half;
                mode_handler[1] = draw16bpp_mode1_half;
@@ -3009,11 +3019,19 @@ void loadConfiguration (void)
    CPC.scr_fs_height = HRES; 
    CPC.scr_fs_bpp = 16;
 
+#ifdef SPMP
+   CPC.scr_style = 1;
+#else
    CPC.scr_style = 2;
+#endif
 
    CPC.scr_vsync = 1; 
    CPC.scr_led = 1; 
+#ifdef SPMP
+   CPC.scr_fps = 1;
+#else
    CPC.scr_fps = WiitukaXML.cpcfps; 
+#endif
    CPC.scr_tube = WiitukaXML.scrtube; //0 COLOR / 1 VERDE
 
    //TODO: Cambiar este valor puede llevar problemas con la gunstick.
@@ -3258,14 +3276,13 @@ void cpc_main (void)
    while (!emuDone) {
 		
       if (!CPC.paused) { // run the emulation, as long as the user doesn't pause it
-
-             #if 1 //ndef GEKKO
              dwTicks = GetTicks();
              if (dwTicks >= dwTicksTargetFPS) { // update FPS counter?
                 dwFPS = dwFrameCount;
                 dwFrameCount = 0;
                 dwTicksTargetFPS = dwTicks + 1000; // prep counter for the next run
              }
+             #ifndef SPMP //GEKKO
 			
              if (( CPC.limit_speed ) && (iExitCondition == EC_CYCLE_COUNT)) {
 		int iTicksAdj = 0; // no adjustment necessary by default
@@ -3284,6 +3301,7 @@ void cpc_main (void)
 
                 dwTicks = GetTicks();
                 if (dwTicks < (dwTicksTarget+iTicksAdj)) { // limit speed?
+                   //printf("delay\n");
                    continue; // delay emulation
                 }
                 dwTicksTarget = dwTicks + dwTicksOffset; // prep counter for the next run
