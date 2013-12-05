@@ -3223,6 +3223,8 @@ void emu_paused (int val)
 
 }
 
+extern int fps_line;
+
 void cpc_main (void)
 {
 
@@ -3326,8 +3328,8 @@ void cpc_main (void)
                 dwFrameCount++;
             		if ( CPC.scr_fps ){ 
                		       char chStr[250];
-		               sprintf(chStr, "%3df %3d%% - %s", (int)dwFPS, (int)dwFPS * 100 / 50, debugstr);  
-		               print((unsigned int *) pix + CPC.scr_line_offs, chStr, true); // display the frames per second counter
+		               sprintf(chStr, "%3df %3d%%", (int)dwFPS, (int)dwFPS * 100 / 50);
+		               print((unsigned int *) pix + (fps_line * CPC.scr_line_offs), chStr, true); // display the frames per second counter
 	                }
 
 		        #if 1

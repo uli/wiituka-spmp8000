@@ -182,9 +182,9 @@ static void bitblit_alpha(int x, int y, uint16_t *data, int w, int h, uint16_t k
 }
 
 int keyboard_x = (WRES - 320) / 2;
-int keyboard_y = HRES - 92;
+int keyboard_y = HRES - 92 - 2;
 int cursor_x = 320 / 2;
-int cursor_y = HRES - 92 / 2;
+int cursor_y = HRES - 92 / 2 - 2;
 
 void draw_keyboard(void)
 {
@@ -192,7 +192,24 @@ void draw_keyboard(void)
     bitblit_alpha(cursor_x - 5, cursor_y - 3, (uint16_t *)cursor_point, 20, 20, 0);
 }
 
+void draw_menu(void)
+{
+    int y = 0;
+    text_set_fg_color(0);
+    text_set_bg_color(MAKE_RGB565(255, 200, 200));
+    text_set_font_size(FONT_SIZE_16);
+    text_render_ex(gp.pixels, gp.width, "MENU", 10, y+=50);
+    text_set_font_size(FONT_SIZE_12);
+    text_render_ex(gp.pixels, gp.width, "SELECT   Reset", 10, y+=20);
+    text_render_ex(gp.pixels, gp.width, "X        Toggle FPS Display", 10, y+=15);
+    text_render_ex(gp.pixels, gp.width, "Triangle Toggle Widescreen Display", 10, y+=15);
+    text_render_ex(gp.pixels, gp.width, "START    Close Menu", 10, y+=15);
+}
+
 int show_keyboard = 0;
+int show_menu = 0;
+int widescreen = 1;
+
 void FillScreen( int Updated )
 {
  static uint64_t last = 0;
@@ -202,6 +219,9 @@ void FillScreen( int Updated )
     //printf("update\n");
     if (show_keyboard) {
         draw_keyboard();
+    }
+    if (show_menu) {
+        draw_menu();
     }
     emuIfGraphShow();
     uint64_t now = libgame_utime();
@@ -239,6 +259,8 @@ unsigned const char keyb_array [6][19] =
 		      { 0x27,0x11,0x11,0x57,0x57,0x57,0x57,0x57,0x57,0x57,0x06,0x06,0x06,0x06,0xff,0x10,0x02,0x01,0xff }
                     };
 
+int fps_line = 1;
+
 int poll_input (void) 
 {
     static uint32_t oldkeys = 0xffffffffUL;
@@ -268,6 +290,9 @@ int poll_input (void)
     }
     if (downkeys & keymap.scancode[EMU_KEY_L]) {
         show_keyboard = !show_keyboard;
+    }
+    if (downkeys & keymap.scancode[EMU_KEY_START]) {
+        show_menu = !show_menu;
     }
     if (show_keyboard) {
         if (!(keys & keymap.scancode[EMU_KEY_O])) {
@@ -300,6 +325,30 @@ int poll_input (void)
                         keyboard_matrix[cpc_key >> 4] |= bit_values[cpc_key & 7];
                 }
             }
+        }
+    }
+    else if (show_menu) {
+        if (downkeys & keymap.scancode[EMU_KEY_SELECT])
+            emulator_reset(true);
+        if (downkeys & keymap.scancode[EMU_KEY_X])
+            CPC.scr_fps = !CPC.scr_fps;
+        if (downkeys & keymap.scancode[EMU_KEY_TRIANGLE]) {
+            widescreen = !widescreen;
+            if (widescreen) {
+                gp.src_clip_x = 0;
+                gp.src_clip_y = 0;
+                gp.src_clip_w = WRES;
+                gp.src_clip_h = HRES;
+            }
+            else {
+                gp.src_clip_x = 0;
+                gp.src_clip_y = (HRES - WRES * 9 / 16) / 2;
+                gp.src_clip_w = WRES;
+                gp.src_clip_h = WRES * 9 / 16;
+            }
+            keyboard_y = gp.src_clip_y + gp.src_clip_h - 92 - 2;
+            fps_line = gp.src_clip_y / 2 + 1;
+            emuIfGraphChgView(&gp);
         }
     }
 #define setkey(x) keyboard_matrix[(x) >> 4] &= ~bit_values[(x) & 7]
@@ -421,6 +470,8 @@ int main(int argc, char *argv[]) {
     libgame_chdir_game();
     _ecos_mkdir("caprice", 0666);
     
+    text_init();
+
     if(!init_linux())
         return 1;
 

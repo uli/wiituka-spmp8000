@@ -407,3 +407,4 @@ inline unsigned char Wiimote_CheckGun (void)
     return 0xff; //nada
 }
 
+int fps_line = 1;
