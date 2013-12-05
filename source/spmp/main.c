@@ -35,8 +35,6 @@ typedef unsigned int bool;
 #include "../ymlib/StSoundLibrary.h"
 #include "../port/ymplayer.h"
 
-#define DEFAULT_FIFO_SIZE	(256*1024)
-
 #include "ui.h"
 
 /*** 2D Video Globals ***/
@@ -125,25 +123,15 @@ inline void linux_draw_bit (Bitu16 *p, Bitu8 v)
     *p = pituka_pal[v];
 }
 
-
 //void SoundUpdate(void);
 void update_sound(void);
 void UpdateScreen (void) 
 {
-#if 1
+#if 0
  static uint64_t last = 0;
  uint64_t now = libgame_utime();
  //printf("update screen %d (%d us)\n", (unsigned int)now, now - last);
-#if 0
- while (now - last < 20000) {
-   SoundUpdate();
-   now = libgame_utime();
- }
-#endif
  last = now;
-    //SoundUpdate();
-    //update_sound();
-    //actualizado directamente en emulacion
  //printf("update screen end %d\n", (unsigned int)libgame_utime());
 #endif
 }
@@ -217,7 +205,7 @@ void FillScreen( int Updated )
     }
     emuIfGraphShow();
     uint64_t now = libgame_utime();
-    printf("fill %d after %d us\n", Updated, (unsigned int)(now - last));
+    //printf("fill %d after %d us\n", Updated, (unsigned int)(now - last));
     last = now;
  //printf("fillscreen end %d %d\n", Updated, (unsigned int)libgame_utime());
 }
@@ -299,7 +287,7 @@ int poll_input (void)
                 kc_px = 0;
             int cpc_key = keyb_array[kc_py][kc_px];
             if (cpc_key != 0xff) {
-                printf("key event at %d/%d (%d/%d), key %0x\n", cursor_x, cursor_y, kc_px, kc_py, cpc_key);
+                //printf("key event at %d/%d (%d/%d), key %0x\n", cursor_x, cursor_y, kc_px, kc_py, cpc_key);
                 if (keys & keymap.scancode[EMU_KEY_O]) {
                     keyboard_matrix[cpc_key >> 4] &= ~bit_values[cpc_key & 7];
                     if (cpc_key != 0x25)
@@ -562,7 +550,6 @@ void close_buffer (void)
 #define PBUFSIZE 1024
 uint16_t playbuf[2][PBUFSIZE * 2];
 
-//void SoundUpdate(void)
 void SoundUpdate(int count)
 {
   static int sample_count = 0;
@@ -620,54 +607,12 @@ int SoundSetup (void)
 
 void SoundInit (void)
 {
-#if 0
-    SDL_AudioSpec *desired, *obtained;
-
-    desired = (SDL_AudioSpec *)malloc(sizeof(SDL_AudioSpec));
-    obtained = (SDL_AudioSpec *)malloc(sizeof(SDL_AudioSpec));
-
-    desired->freq = 48000;
-    desired->format = AUDIO_S16LSB;
-    desired->channels = 2;
-    desired->samples = audio_align_samples(desired->freq / 50); // desired is 20ms at the given frequency
-
-    desired->callback = SoundUpdate;
-    desired->userdata = NULL;
-
-    if (SDL_OpenAudio(desired, obtained) < 0) 
-    {
-        fprintf(stderr, "Could not open audio: %s\n", SDL_GetError());
-        return;
-    }
-
-    free(desired);
-    audio_spec = obtained;
-
-    printf("AUDIO - S: %i\n",audio_spec->size);
-#else
     sp.rate = 44100;//48000;
     sp.channels = 2;
     sp.depth = 0;
     sp.callback = 0;
     //sp.buf_size = AUDIO_BUF_SIZE * 2 * 2;
     emuIfSoundInit(&sp);
-    
-#if 0
-    cyg_handle_t snd_handle;
-    cyg_thread snd_data;
-    cyg_thread_create(cyg_thread_get_priority(cyg_thread_self()),
-                      SoundThread,
-                      0,
-                      "sound_thread",
-                      sound_stack,
-                      0x1000,
-                      &snd_handle,
-                      &snd_data
-                     );
-    cyg_thread_resume(snd_handle);
-#endif
-#endif
-
 }
 
 void SoundClose (void)
