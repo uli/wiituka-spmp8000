@@ -550,31 +550,32 @@ void close_buffer (void)
    SND DEBUG CODE
 */
 #define PBUFSIZE 1024
-uint16_t playbuf[2][PBUFSIZE * 2];
+#define SOUND_CHANNELS 2
+uint16_t playbuf[2][PBUFSIZE * SOUND_CHANNELS];
 
 void SoundUpdate(int count)
 {
   static int sample_count = 0;
   static int cur_buf = 0;
   sample_count += count;
-  if (sample_count >= PBUFSIZE *2 * 2) {
+  if (sample_count >= PBUFSIZE * SOUND_CHANNELS * 2) {
         if(ym_playing)
         {
-                    int nbSample = PBUFSIZE * 2 * 2 / sizeof(ymsample);
+                    int nbSample = PBUFSIZE * SOUND_CHANNELS * 2 / sizeof(ymsample);
                     ymMusicCompute((void*)s_pMusic,(ymsample*)playbuf[cur_buf],nbSample);
                     //memset(playbuf[cur_buf], 0,  PBUFSIZE * 2 * 2);
         }
         else
         {
-            memcpy(playbuf[cur_buf], pbSndStream, PBUFSIZE * 2 * 2);
+            memcpy(playbuf[cur_buf], pbSndStream, PBUFSIZE * SOUND_CHANNELS * 2);
             //memset(playbuf[cur_buf], 0, PBUFSIZE * 2 * 2);
-            pbSndStream += PBUFSIZE * 2 * 2;
+            pbSndStream += PBUFSIZE * SOUND_CHANNELS * 2;
 
             if (pbSndStream >= pbSndBufferEnd) 
                 pbSndStream = pbSndBuffer;
         }
         sp.buf = (uint8_t *)playbuf[cur_buf];
-        sp.buf_size = PBUFSIZE * 2 * 2;
+        sp.buf_size = PBUFSIZE * SOUND_CHANNELS * 2;
         //uint64_t now = libgame_utime();
         emuIfSoundPlay(&sp);
         //next = libgame_utime() + (PBUFSIZE * 1000000 / 48000) - 200;
@@ -609,8 +610,8 @@ int SoundSetup (void)
 
 void SoundInit (void)
 {
-    sp.rate = 44100;//48000;
-    sp.channels = 2;
+    sp.rate = 48000;
+    sp.channels = SOUND_CHANNELS;
     sp.depth = 0;
     sp.callback = 0;
     //sp.buf_size = AUDIO_BUF_SIZE * 2 * 2;
