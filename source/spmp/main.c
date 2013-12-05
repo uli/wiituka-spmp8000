@@ -418,9 +418,11 @@ static void map_buttons(void)
 int main(int argc, char *argv[]) {
     int i,length;
 
+#ifdef SPMP_USB
     libgame_set_debug(0);
     usbdbg_init();
     usbdbg_redirect_stdio(1);
+#endif
 
     printf("ARM frequency %d\n", GetArmCoreFreq());
     changeARMFreq(333);

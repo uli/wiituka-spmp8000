@@ -28,6 +28,7 @@ LIBS	= -lgame -lc -lgcc -lstdc++ -lz -lm
 
 CFLAGS = -g -O3 -Iymlib -DSPMP
 CFLAGS += -fprofile-use
+#CFLAGS += -DSPMP_USB
 
 include $(LIBSPMP8K)/main.cfg
 include $(LIBGAME)/libgame.mk
