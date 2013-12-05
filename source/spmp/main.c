@@ -280,13 +280,15 @@ int poll_input (void)
     if (downkeys & keymap.scancode[EMU_KEY_R]) {
         char *romname = 0;
         int res;
-        if ((res = select_file(NULL, "dsk|zip", &romname, FONT_SIZE_16)) < 0) {
+        if ((res = select_file(NULL, "dsk|zip", &romname, FONT_SIZE_12, 0, MAKE_RGB565(255, 200, 200))) < 0) {
             printf("select_file %d\n", res);
         }
         if (romname) {
             printf("loading image %s\n", romname);
             loadFiled_rom(romname);
         }
+        oldkeys = emuIfKeyGetInput(&keymap);
+        return 0;
     }
     if (downkeys & keymap.scancode[EMU_KEY_L]) {
         show_keyboard = !show_keyboard;

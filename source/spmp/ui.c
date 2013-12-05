@@ -65,7 +65,14 @@ static void invert(uint16_t *start, int size)
     }
 }
 
-int select_file(const char *start, const char *extension, char **file, int font_size)
+void memset16(uint16_t *mem, uint16_t val, int count)
+{
+    int i;
+    for (i = 0; i < count; i++)
+        mem[i] = val;
+}
+
+int select_file(const char *start, const char *extension, char **file, int font_size, uint16_t fg, uint16_t bg)
 {
     char wd[256];
     getcwd(wd, 256);
@@ -74,6 +81,9 @@ int select_file(const char *start, const char *extension, char **file, int font_
     dents = malloc(sizeof(struct _ecos_dirent) * 10);
     stats = malloc(sizeof(struct _ecos_stat) * 10);
     int num_dents = 10;
+
+    text_set_fg_color(fg);
+    text_set_bg_color(bg);
 
     if (start) {
         if (_ecos_chdir(start) < 0)
@@ -118,7 +128,7 @@ reload_dir:
     for (;;) {
         int i;
         uint16_t *fb = gDisplayDev->getShadowBuffer();
-        memset(fb, 0xff, screen_width * screen_height * 2);
+        memset16(fb, bg, screen_width * screen_height);
         for (i = current_top;
              i < current_top + max_entries_displayed && i < current_top + dent_count; i++) {
             if (_ECOS_S_ISDIR(stats[i].st_mode)) {
