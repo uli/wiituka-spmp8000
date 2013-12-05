@@ -18,6 +18,7 @@
 
 
 
+#ifndef SPMP
 void draw16bpp_border(void)
 {
    int colour;
@@ -35,7 +36,22 @@ void draw16bpp_border(void)
    *(mem_ptr+7) = colour;
    CPC.scr_offs += 8; // update PC screen buffer address
 }
+#else
+/* using 32-bit writes is a little faster when you have a constant value */
+void draw16bpp_border(void)
+{
+   int colour;
+   register dword *mem_ptr;
 
+   colour = (GateArray.palette[16] << 16) | GateArray.palette[16];
+   mem_ptr = (dword *)(CPC.scr_base3 + CPC.scr_offs); // PC screen buffer address
+   *mem_ptr = colour; // write one pixel of border colour
+   *(mem_ptr+1) = colour;
+   *(mem_ptr+2) = colour;
+   *(mem_ptr+3) = colour;
+   CPC.scr_offs += 8; // update PC screen buffer address
+}
+#endif
 
 
 void draw16bpp_mode0(dword addr)
