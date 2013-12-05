@@ -833,15 +833,18 @@ void print (unsigned int *pdwAddr, char *pchStr, int bolColour)
    int iLen, iIdx, iRow, iCol, n;
    int next_line = CPC.scr_bps;
    dword *pdwLine;
+   word *pwLine;
+   word *pwAddr = (word *)pdwAddr;
    dword dwColour, *pdwPixel;
    word wColour, *pwPixel;
    byte bRow;//, bColour, *pbPixel;
 
+   //printf("-%s- at %p bpp %d\n", pchStr, pdwAddr, CPC.scr_bpp);
    switch (CPC.scr_bpp)
    {
       #if 1
       case 16: //32
-         dwColour = bolColour ? 0xffffffff : 0xcccccccc;
+         wColour = bolColour ? 0xffffffff : 0xcccccccc;
          iLen = strlen(pchStr); // number of characters to process
          for (n = 0; n < iLen; n++) {
             iIdx = (int)pchStr[n]; // get the ASCII value
@@ -849,26 +852,28 @@ void print (unsigned int *pdwAddr, char *pchStr, int bolColour)
                iIdx = FNT_BAD_CHAR;
             }
             iIdx -= FNT_MIN_CHAR; // zero base the index
-            pdwLine = pdwAddr; // keep a reference to the current screen position
+            pwLine = pwAddr; // keep a reference to the current screen position
             for (iRow = 0; iRow < FNT_CHAR_HEIGHT; iRow++) { // loop for all rows in the font character
-               pdwPixel = pdwLine;
+               pwPixel = pwLine;
                bRow = bFont[iIdx]; // get the bitmap information for one row
                for (iCol = 0; iCol < FNT_CHAR_WIDTH; iCol++) { // loop for all columns in the font character
                   if (bRow & 0x80) { // is the bit set?
-                     *(pdwPixel+1) = 0; // draw the "shadow"
-                     *(pdwPixel+CPC.scr_line_offs) = 0;
-                     *(pdwPixel+CPC.scr_line_offs+1) = 0;
-                     *pdwPixel = dwColour; // draw the character pixel
-		     *(pdwPixel + next_line) = dwColour;
+                     *(pwPixel+1) = 0; // draw the "shadow"
+                     *(pwPixel+CPC.scr_line_offs) = 0;
+                     *(pwPixel+CPC.scr_line_offs+1) = 0;
+                     *pwPixel = wColour; // draw the character pixel
+		     *(pwPixel + next_line * 2) = wColour;
+		     //printf("drawn at %p\n", pwPixel + next_line);
                   }
-                  pdwPixel++; // update the screen position
+                  pwPixel++; // update the screen position
                   bRow <<= 1; // advance to the next bit
                }
-               pdwLine += CPC.scr_line_offs/2; // advance to next screen line
+               pwLine += CPC.scr_line_offs;///2; // advance to next screen line
                iIdx += FNT_CHARS; // advance to next row in font data
             }
-            pdwAddr += FNT_CHAR_WIDTH; // set screen address to next character position
+            pwAddr += FNT_CHAR_WIDTH; // set screen address to next character position
          }
+         return;
          break;
       #endif
       #if 0
