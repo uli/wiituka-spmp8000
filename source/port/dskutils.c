@@ -227,7 +227,7 @@ bool Explorer_dskBufferedRead ( void * dskBuffer)
     return true;
 }
 
-
+#if 0
 bool Explorer_dskRead ( char * dskname )
 {
     char tmppath[50] = "\0";
@@ -367,6 +367,7 @@ bool Explorer_dskRead ( char * dskname )
     return true;
 
 }
+#endif
 
 /*
   FILE UTILS
